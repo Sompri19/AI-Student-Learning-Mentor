@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Study Plan: {{ plan.subject_name }} - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="study-plan-detail-section">
+    <div class="content-container">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a> &gt; 
+            <a href="{{ url_for('study_plans_list') }}">Study Plans</a> &gt; 
+            <span>Plan #{{ plan.id }}</span>
+        </nav>
+
+        <!-- Plan Header Hero -->
+        <div class="card plan-hero-card">
+            <div class="plan-hero-top">
+                <div class="hero-tags">
+                    <span class="badge badge-subject">{{ plan.subject_name }}</span>
+                    <span class="badge badge-duration">⏱ {{ plan.duration_days }} Days Duration</span>
+                    <span class="meta-pill">⚡ {{ plan.skill_level }}</span>
+                    <span class="meta-pill">⏰ {{ plan.preferred_study_time }}</span>
+                </div>
+                <div class="plan-hero-actions">
+                    <a href="{{ url_for('study_plan_edit', plan_id=plan.id) }}" class="btn btn-secondary btn-sm">
+                        ✏️ Edit Plan
+                    </a>
+                    <form action="{{ url_for('study_plan_delete', plan_id=plan.id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to permanently delete this study plan?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            🗑️ Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <h1 class="plan-goal-title">{{ plan.goal }}</h1>
+            <p class="plan-created-subtext text-muted">
+                Created on {{ plan.created_at.strftime('%B %d, %Y at %I:%M %p') if plan.created_at else 'Recently' }}
+            </p>
+
+            <!-- Authentic Progress Bar Widget -->
+            <div class="plan-progress-dashboard" id="plan-progress-widget">
+                <div class="progress-info-row">
+                    <div>
+                        <span class="progress-headline font-bold">Progress Completion</span>
+                        <span class="progress-counter text-muted" id="progress-counter-text">
+                            ({{ completed_tasks }} of {{ total_tasks }} tasks completed)
+                        </span>
+                    </div>
+                    <span class="progress-percentage-large" id="progress-percentage-text">{{ completion_percentage }}%</span>
+                </div>
+                <div class="progress-bar-track progress-bar-large">
+                    <div class="progress-bar-fill" id="progress-bar-fill" style="width: {{ completion_percentage }}%;"></div>
+                </div>
+                {% if completed_tasks == total_tasks and total_tasks > 0 %}
+                    <div class="alert alert-success mt-2">
+                        🎉 Excellent work! All scheduled tasks in this study plan are complete.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Topics in this Plan -->
+        <div class="card topics-summary-card">
+            <h3>Syllabus Topics Covered in this Plan ({{ topics|length }})</h3>
+            <div class="plan-topic-pills">
+                {% for topic in topics %}
+                    <a href="/topics/{{ topic.id }}" class="topic-pill-link" title="Open Topic & Learning Resources">
+                        <span class="topic-pill-name">📖 {{ topic.topic_name or topic.name }}</span>
+                        <span class="badge badge-difficulty badge-difficulty-{{ topic.difficulty|lower }}">{{ topic.difficulty }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Daily Task Schedule Section -->
+        <div class="daily-schedule-section">
+            <div class="schedule-header-row">
+                <h2>Daily Learning Schedule ({{ items|length }} Days)</h2>
+                <span class="text-muted">Check off tasks as you finish each study milestone.</span>
+            </div>
+
+            <div class="tasks-list">
+                {% for item in items %}
+                    <div class="card task-item-card {% if item.completed %}task-completed{% endif %}" id="task-card-{{ item.id }}">
+                        <div class="task-day-badge">
+                            <span class="day-label">DAY</span>
+                            <span class="day-number">{{ item.day_number }}</span>
+                        </div>
+
+                        <div class="task-content-body">
+                            <div class="task-meta-top">
+                                {% if item.topic_id %}
+                                    <a href="/topics/{{ item.topic_id }}" class="task-topic-link" title="View Topic Resources">
+                                        🔗 {{ item.topic_name or 'Curriculum Topic' }}
+                                    </a>
+                                    {% if item.topic_difficulty %}
+                                        <span class="badge badge-difficulty badge-difficulty-{{ item.topic_difficulty|lower }}">{{ item.topic_difficulty }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">📚 Comprehensive Review</span>
+                                {% endif %}
+                                <span class="task-status-pill {% if item.completed %}status-done{% else %}status-pending{% endif %}" id="status-pill-{{ item.id }}">
+                                    {% if item.completed %}✓ Completed{% else %}Pending{% endif %}
+                                </span>
+                            </div>
+
+                            <p class="task-instruction-text" id="task-desc-{{ item.id }}">{{ item.task }}</p>
+
+                            {% if item.topic_id %}
+                                <div class="task-resource-shortcut">
+                                    <a href="/topics/{{ item.topic_id }}" class="resource-link-inline">
+                                        Access Study Resources for this Topic →
+                                    </a>
+                                    <span class="separator-dot mx-1">•</span>
+                                    <a href="/quizzes/topic/{{ item.topic_id }}" class="resource-link-inline quiz-link-highlight">
+                                        🎯 Take Practice Quiz →
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="task-action-col">
+                            <form action="{{ url_for('study_plan_toggle_item', plan_id=plan.id, item_id=item.id) }}" 
+                                  method="POST" 
+                                  class="toggle-task-form"
+                                  onsubmit="return handleTaskToggle(event, {{ plan.id }}, {{ item.id }});">
+                                <button type="submit" 
+                                        class="btn btn-sm {% if item.completed %}btn-outline-warning{% else %}btn-success{% endif %} toggle-btn"
+                                        id="toggle-btn-{{ item.id }}">
+                                    {% if item.completed %}Mark Incomplete{% else %}✓ Mark Done{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="page-footer-nav">
+            <a href="{{ url_for('study_plans_list') }}" class="btn btn-outline">← Back to All Study Plans</a>
+            <a href="{{ url_for('study_plan_create') }}" class="btn btn-primary">+ Create Another Plan</a>
+        </div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/study_plan.js') }}"></script>
+{% endblock %}

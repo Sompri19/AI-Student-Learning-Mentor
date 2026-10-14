@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}AI Doubt Assistant - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="ai-assistant-section">
+    <div class="content-container form-container-wide">
+        <!-- Header Banner -->
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">AI Doubt Assistant</h1>
+                <p class="text-muted">
+                    Ask questions about your subjects and get AI-powered conceptual explanations.
+                </p>
+            </div>
+            <div class="header-action">
+                <a href="{{ url_for('ai_history') }}" class="btn btn-outline">
+                    💬 My Chat History
+                </a>
+            </div>
+        </div>
+
+        <!-- Academic Integrity Notice -->
+        <div class="card callout-card callout-info mb-2">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+                <strong>Academic Mentor Guidelines:</strong>
+                The AI Doubt Assistant breaks down difficult academic concepts, provides illustrative examples, and guides your understanding step-by-step. Real AI responses require an active API key; when unavailable, the system safely notifies you without generating fabricated answers.
+            </div>
+        </div>
+
+        <!-- Question Form Card -->
+        <div class="card ai-card">
+            <form id="ai-ask-form" action="{{ url_for('ai_ask') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-row form-grid-2">
+                    <!-- Optional Subject Selector -->
+                    <div class="form-group">
+                        <label for="subject_id" class="form-label">
+                            Academic Subject <span class="text-muted font-sm">(Optional)</span>
+                        </label>
+                        <select name="subject_id" id="subject_id" class="form-control">
+                            <option value="">-- Any / General Subject --</option>
+                            {% for s in subjects %}
+                                <option value="{{ s.id }}" {% if selected_subject_id == s.id %}selected{% endif %}>
+                                    {{ s.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Optional Topic Selector -->
+                    <div class="form-group">
+                        <label for="topic_id" class="form-label">
+                            Specific Topic <span class="text-muted font-sm">(Optional)</span>
+                        </label>
+                        <select name="topic_id" id="topic_id" class="form-control">
+                            <option value="">-- Any / General Topic --</option>
+                            {% for t in initial_topics %}
+                                <option value="{{ t.id }}" {% if selected_topic_id == t.id %}selected{% endif %}>
+                                    {{ t.topic_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Question Textarea -->
+                <div class="form-group mt-2">
+                    <label for="question" class="form-label">
+                        Your Academic Question <span class="required-star">*</span>
+                    </label>
+                    <textarea 
+                        name="question" 
+                        id="question" 
+                        rows="5" 
+                        class="form-control" 
+                        placeholder="Ask your academic question... (e.g. What is the difference between a list and a tuple in Python, and when should I use each?)"
+                        maxlength="2000"
+                        required>{{ question or '' }}</textarea>
+                    
+                    <div class="textarea-footer">
+                        <span class="text-muted font-sm">
+                            Be specific to receive clearer explanations and concrete examples.
+                        </span>
+                        <span id="char-counter" class="char-count font-sm">0 / 2000</span>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions mt-3">
+                    <button type="submit" id="submit-btn" class="btn btn-primary btn-lg">
+                        Ask AI Mentor 🤖
+                    </button>
+                    <a href="{{ url_for('ai_assistant') }}" class="btn btn-secondary">
+                        Clear
+                    </a>
+                </div>
+            </form>
+
+            <!-- Loading State -->
+            <div id="ai-loading" class="ai-loading-box mt-3" style="display: none;">
+                <div class="spinner"></div>
+                <div class="loading-text">
+                    <strong>AI Mentor is thinking...</strong>
+                    <p class="text-muted font-sm">Synthesizing step-by-step educational explanation.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Response Area -->
+        {% if answer %}
+            <div class="card ai-response-card mt-3">
+                <div class="response-header">
+                    <div class="response-title-wrap">
+                        <span class="mentor-badge">🤖 AI Mentor</span>
+                        <h2 class="response-heading">Explanation & Key Concepts</h2>
+                    </div>
+                    {% if subject_name or topic_name %}
+                        <div class="response-context-tags">
+                            {% if subject_name %}
+                                <span class="badge badge-subject">{{ subject_name }}</span>
+                            {% endif %}
+                            {% if topic_name %}
+                                <span class="badge badge-duration">{{ topic_name }}</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="student-question-preview">
+                    <span class="q-label">Question Asked:</span>
+                    <p class="q-text">{{ question }}</p>
+                </div>
+
+                <div class="ai-answer-box">
+                    <div class="ai-answer-content">{{ answer }}</div>
+                </div>
+
+                <div class="response-footer">
+                    <span class="text-muted font-sm">
+                        ✓ Saved to your private chat history.
+                    </span>
+                    <a href="{{ url_for('ai_history') }}" class="btn btn-outline btn-sm">
+                        View in History →
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

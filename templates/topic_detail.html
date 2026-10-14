@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic.topic_name }} - Learning Resources - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="topic-detail-page">
+    <div class="content-container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <a href="/subjects" class="breadcrumb-link">Subjects</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="/subjects/{{ topic.subject_id }}" class="breadcrumb-link">{{ topic.subject_name|safe }}</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">{{ topic.topic_name|safe }}</span>
+        </nav>
+
+        <!-- Topic Banner -->
+        <div class="card topic-banner">
+            <div class="topic-banner-content">
+                <div class="topic-banner-tags">
+                    <span class="badge badge-difficulty badge-{{ topic.difficulty|lower }}">{{ topic.difficulty }} Difficulty</span>
+                    <a href="/subjects/{{ topic.subject_id }}" class="badge badge-subject-link">{{ topic.subject_name|safe }}</a>
+                </div>
+                <h1 class="topic-banner-title">{{ topic.topic_name|safe }}</h1>
+                <p class="topic-banner-desc">{{ topic.description }}</p>
+            </div>
+            <div class="topic-banner-meta">
+                <div class="stat-pill">
+                    <span class="stat-num">{{ resources|length }}</span>
+                    <span class="stat-text">Resources Available</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Section Header & Filters -->
+        <div class="resources-control-row">
+            <div class="control-left">
+                <h2>Verified Learning Resources</h2>
+                <p class="text-muted">High-yield documentation, articles, interactive practice, and conceptual notes.</p>
+            </div>
+            <div class="control-right">
+                <div class="filter-pills-wrap">
+                    <span class="filter-label">Type:</span>
+                    <a href="/topics/{{ topic.id }}{% if selected_difficulty %}?difficulty={{ selected_difficulty }}{% endif %}" class="filter-pill {% if not selected_type %}active{% endif %}">
+                        All
+                    </a>
+                    {% for t in allowed_types %}
+                        <a href="/topics/{{ topic.id }}?resource_type={{ t }}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}" class="filter-pill {% if selected_type == t %}active{% endif %}">
+                            {{ t }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources List / Grid -->
+        {% if resources %}
+            <div class="resources-grid">
+                {% for res in resources %}
+                    <div class="card resource-card">
+                        <div class="resource-card-header">
+                            <div class="resource-meta">
+                                <span class="badge badge-type badge-type-{{ res.resource_type|lower }}">
+                                    {% if res.resource_type == 'Documentation' %}📖
+                                    {% elif res.resource_type == 'Video' %}🎥
+                                    {% elif res.resource_type == 'Article' %}📰
+                                    {% elif res.resource_type == 'Notes' %}📝
+                                    {% elif res.resource_type == 'Practice' %}⚡
+                                    {% else %}📄
+                                    {% endif %}
+                                    {{ res.resource_type }}
+                                </span>
+                                <span class="badge badge-difficulty badge-{{ res.difficulty|lower }}">{{ res.difficulty }}</span>
+                            </div>
+                        </div>
+
+                        <h3 class="resource-title">{{ res.title|safe }}</h3>
+                        <p class="resource-desc">{{ res.description }}</p>
+
+                        <div class="resource-card-footer">
+                            {% if res.is_safe_url %}
+                                <a 
+                                    href="{{ res.url }}" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Open Resource ↗
+                                </a>
+                            {% else %}
+                                <span class="badge badge-warning" title="Link violates safety policy">
+                                    ⚠️ Unsafe Scheme Disabled
+                                </span>
+                            {% endif %}
+                            <span class="resource-source text-muted">Verified Reference</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card empty-results-card">
+                <div class="empty-icon">📂</div>
+                <h4>No learning resources found for the selected filter</h4>
+                <p class="text-muted">Clear the resource type or difficulty filter to view all materials for {{ topic.topic_name }}.</p>
+                <a href="/topics/{{ topic.id }}" class="btn btn-secondary btn-sm">Clear Filter</a>
+            </div>
+        {% endif %}
+
+        <!-- Integrated Learning Actions Callout -->
+        <div class="card roadmap-callout mt-2">
+            <div class="roadmap-header">
+                <span class="roadmap-icon">🚀</span>
+                <h4>Integrated Learning Actions for {{ topic.topic_name }}</h4>
+            </div>
+            <p>
+                Take the next step in mastering this concept using our integrated mentorship tools:
+            </p>
+            <div class="topic-actions-row mt-2" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <a href="{{ url_for('quiz_start', topic_id=topic.id) }}" class="btn btn-primary btn-sm">
+                    📝 Practice Quiz
+                </a>
+                <a href="{{ url_for('ai_assistant') }}?topic_id={{ topic.id }}&subject_id={{ topic.subject_id }}" class="btn btn-secondary btn-sm">
+                    🤖 Ask AI Mentor
+                </a>
+                <a href="{{ url_for('study_plan_create') }}?subject_id={{ topic.subject_id }}" class="btn btn-outline btn-sm">
+                    📅 Add to Study Plan
+                </a>
+            </div>
+        </div>
+
+        <div class="page-back-action">
+            <a href="/subjects/{{ topic.subject_id }}" class="btn btn-secondary btn-sm">← Back to {{ topic.subject_name }}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

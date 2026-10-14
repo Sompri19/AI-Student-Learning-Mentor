@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results: {{ attempt.topic_name }} - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="quiz-result-section">
+    <div class="content-container form-container-wide">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a> &gt; 
+            <a href="{{ url_for('quizzes_catalog') }}">Quizzes</a> &gt; 
+            <span>Scorecard #{{ attempt.id }}</span>
+        </nav>
+
+        <div class="card quiz-scorecard-card">
+            <div class="scorecard-top">
+                <span class="badge badge-subject">{{ attempt.subject_name }}</span>
+                <span class="badge {{ attempt.feedback.badge_class }}">
+                    {{ attempt.feedback.grade }} • {{ attempt.feedback.title }}
+                </span>
+            </div>
+
+            <h1 class="scorecard-topic-title">{{ attempt.topic_name }}</h1>
+            <p class="text-muted font-sm">
+                Completed on {{ attempt.attempted_at.strftime('%B %d, %Y at %I:%M %p') if attempt.attempted_at else 'Recently' }}
+            </p>
+
+            <!-- Score Circle / Badge -->
+            <div class="scorecard-hero-block">
+                <div class="score-circle-display">
+                    <span class="score-percent-val">{{ attempt.score_percentage|int if attempt.score_percentage == attempt.score_percentage|int else attempt.score_percentage }}%</span>
+                    <span class="score-percent-lbl">Final Score</span>
+                </div>
+
+                <div class="scorecard-message-box">
+                    <h3 class="feedback-title">{{ attempt.feedback.title }}</h3>
+                    <p class="feedback-text">{{ attempt.feedback.message }}</p>
+                </div>
+            </div>
+
+            <!-- Score Metrics Grid -->
+            <div class="score-metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-num">{{ attempt.total_questions }}</span>
+                    <span class="metric-label">Total Questions</span>
+                </div>
+                <div class="metric-box metric-correct">
+                    <span class="metric-num">✓ {{ attempt.correct_answers }}</span>
+                    <span class="metric-label">Correct Answers</span>
+                </div>
+                <div class="metric-box metric-incorrect">
+                    <span class="metric-num">✕ {{ attempt.incorrect_answers }}</span>
+                    <span class="metric-label">Incorrect Answers</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-num">{{ attempt.correct_answers }} / {{ attempt.total_questions }}</span>
+                    <span class="metric-label">Raw Accuracy</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="scorecard-actions">
+                <a href="{{ url_for('quiz_review', attempt_id=attempt.id) }}" class="btn btn-primary btn-lg">
+                    Review Questions & Answers 🔍
+                </a>
+                <a href="{{ url_for('quiz_start', topic_id=attempt.topic_id) }}" class="btn btn-secondary btn-lg">
+                    Retake Quiz 🔄
+                </a>
+            </div>
+
+            <div class="scorecard-secondary-links">
+                <a href="{{ url_for('ai_assistant') }}?topic_id={{ attempt.topic_id }}&subject_id={{ attempt.subject_id }}" class="link-muted">
+                    🤖 Ask AI Mentor About This Topic
+                </a>
+                <span class="separator-dot">•</span>
+                <a href="{{ url_for('progress_page') }}" class="link-muted">
+                    📈 View My Progress Center
+                </a>
+                <span class="separator-dot">•</span>
+                <a href="/topics/{{ attempt.topic_id }}" class="link-muted">
+                    📖 Study Learning Resources
+                </a>
+                <span class="separator-dot">•</span>
+                <a href="{{ url_for('quiz_history') }}" class="link-muted">
+                    📊 Quiz History
+                </a>
+                <span class="separator-dot">•</span>
+                <a href="{{ url_for('quizzes_catalog') }}" class="link-muted">
+                    📚 Quiz Catalog
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

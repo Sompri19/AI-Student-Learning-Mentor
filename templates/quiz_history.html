@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}My Quiz History - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="quiz-history-section">
+    <div class="content-container">
+        <!-- Header Banner -->
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">My Quiz History</h1>
+                <p class="text-muted">
+                    Your complete record of completed practice quizzes, scores, and answer breakdowns.
+                </p>
+            </div>
+            <div class="header-action">
+                <a href="{{ url_for('quizzes_catalog') }}" class="btn btn-primary">
+                    + Take Another Quiz
+                </a>
+            </div>
+        </div>
+
+        {% if not history %}
+            <!-- Empty State -->
+            <div class="card empty-state-card">
+                <div class="empty-state-icon">📊</div>
+                <h3>No Quiz Attempts Yet</h3>
+                <p class="text-muted">
+                    You haven't completed any practice quizzes yet. Choose an academic topic to test your knowledge and validate conceptual retention.
+                </p>
+                <div class="empty-state-actions">
+                    <a href="{{ url_for('quizzes_catalog') }}" class="btn btn-primary btn-lg">
+                        Browse Available Quizzes
+                    </a>
+                    <a href="/subjects" class="btn btn-outline btn-lg">
+                        Explore Subjects & Topics
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Attempts Table / Cards -->
+            <div class="card history-table-card">
+                <div class="table-responsive">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Subject & Topic</th>
+                                <th>Date & Time</th>
+                                <th>Questions</th>
+                                <th>Score</th>
+                                <th>Evaluation</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in history %}
+                                <tr>
+                                    <td>
+                                        <div class="history-topic-wrap">
+                                            <span class="badge badge-subject badge-xs">{{ item.subject_name }}</span>
+                                            <strong class="history-topic-title">{{ item.topic_name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td class="history-date text-muted">
+                                        {{ item.attempted_at.strftime('%b %d, %Y • %I:%M %p') if item.attempted_at else 'Recent' }}
+                                    </td>
+                                    <td>
+                                        {{ item.correct_answers }} / {{ item.total_questions }} Correct
+                                    </td>
+                                    <td>
+                                        <span class="history-score-val font-bold">
+                                            {{ item.score_percentage|int if item.score_percentage == item.score_percentage|int else item.score_percentage }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ item.feedback.badge_class }}">
+                                            {{ item.feedback.grade }} • {{ item.feedback.title }}
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="history-actions-row">
+                                            <a href="{{ url_for('quiz_result', attempt_id=item.id) }}" class="btn btn-secondary btn-xs" title="View Scorecard">
+                                                Scorecard
+                                            </a>
+                                            <a href="{{ url_for('quiz_review', attempt_id=item.id) }}" class="btn btn-primary btn-xs" title="Review Questions">
+                                                Review Answers
+                                            </a>
+                                            <a href="{{ url_for('quiz_start', topic_id=item.topic_id) }}" class="btn btn-outline btn-xs" title="Retake Quiz">
+                                                Retake
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Taking Quiz: {{ topic.topic_name }} - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="active-quiz-section">
+    <div class="content-container form-container-wide">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a> &gt; 
+            <a href="{{ url_for('quizzes_catalog') }}">Quizzes</a> &gt; 
+            <a href="{{ url_for('quiz_topic_preview', topic_id=topic.topic_id) }}">{{ topic.topic_name }}</a> &gt; 
+            <span>Active Assessment</span>
+        </nav>
+
+        <!-- Quiz Header Card -->
+        <div class="card active-quiz-header-card">
+            <div class="active-quiz-header-top">
+                <div>
+                    <span class="badge badge-subject">{{ topic.subject_name }}</span>
+                    <h1 class="active-quiz-title">{{ topic.topic_name }}</h1>
+                </div>
+                <div class="quiz-tracker-badge">
+                    <span id="answered-counter">0</span> / {{ questions|length }} Answered
+                </div>
+            </div>
+
+            <!-- Quiz Progress Bar -->
+            <div class="progress-bar-track mt-2">
+                <div class="progress-bar-fill" id="quiz-progress-bar" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <form action="{{ url_for('quiz_submit', topic_id=topic.topic_id) }}" method="POST" id="quiz-form" class="quiz-form-flow">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="topic_id" value="{{ topic.topic_id }}">
+
+            {% for q in questions %}
+                <div class="card question-card" id="card-q-{{ q.id }}">
+                    <div class="question-header">
+                        <span class="question-number-pill">Question {{ loop.index }} of {{ questions|length }}</span>
+                        <span class="badge badge-difficulty badge-difficulty-{{ q.difficulty|lower }}">
+                            {{ q.difficulty }}
+                        </span>
+                    </div>
+
+                    <h3 class="question-stem">{{ q.question }}</h3>
+
+                    <div class="options-container">
+                        <!-- Option A -->
+                        <label class="option-label" for="opt-{{ q.id }}-A">
+                            <input type="radio" name="question_{{ q.id }}" id="opt-{{ q.id }}-A" value="A" 
+                                   class="option-radio" onchange="updateQuizProgress()">
+                            <span class="option-badge">A</span>
+                            <span class="option-text">{{ q.option_a }}</span>
+                        </label>
+
+                        <!-- Option B -->
+                        <label class="option-label" for="opt-{{ q.id }}-B">
+                            <input type="radio" name="question_{{ q.id }}" id="opt-{{ q.id }}-B" value="B" 
+                                   class="option-radio" onchange="updateQuizProgress()">
+                            <span class="option-badge">B</span>
+                            <span class="option-text">{{ q.option_b }}</span>
+                        </label>
+
+                        <!-- Option C -->
+                        <label class="option-label" for="opt-{{ q.id }}-C">
+                            <input type="radio" name="question_{{ q.id }}" id="opt-{{ q.id }}-C" value="C" 
+                                   class="option-radio" onchange="updateQuizProgress()">
+                            <span class="option-badge">C</span>
+                            <span class="option-text">{{ q.option_c }}</span>
+                        </label>
+
+                        <!-- Option D -->
+                        <label class="option-label" for="opt-{{ q.id }}-D">
+                            <input type="radio" name="question_{{ q.id }}" id="opt-{{ q.id }}-D" value="D" 
+                                   class="option-radio" onchange="updateQuizProgress()">
+                            <span class="option-badge">D</span>
+                            <span class="option-text">{{ q.option_d }}</span>
+                        </label>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Submit Section -->
+            <div class="quiz-submit-card card">
+                <div class="quiz-submit-info">
+                    <h4>Ready to submit?</h4>
+                    <p class="text-muted font-sm">
+                        Please review your answers before submitting. Your answers will be securely graded server-side against the official curriculum.
+                    </p>
+                </div>
+                <div class="quiz-submit-actions">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submit-quiz-btn">
+                        Submit Quiz & Grade Answers 📝
+                    </button>
+                    <a href="{{ url_for('quizzes_catalog') }}" class="btn btn-secondary btn-lg" 
+                       onclick="return confirm('Are you sure you want to leave this quiz? Your answers will not be saved.');">
+                        Exit Quiz
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Register - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="auth-icon">🎓</span>
+            <h2>Create Student Account</h2>
+            <p>Join the AI Student Learning Mentor platform and begin structuring your study journey.</p>
+        </div>
+
+        <form method="POST" action="/register" class="auth-form" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    value="{{ name|default('') }}" 
+                    class="form-control" 
+                    placeholder="e.g. Alex Johnson" 
+                    required 
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    value="{{ email|default('') }}" 
+                    class="form-control" 
+                    placeholder="student@university.edu" 
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control" 
+                    placeholder="Minimum 6 characters" 
+                    minlength="6" 
+                    required
+                >
+                <span class="form-hint">Must be at least 6 characters long.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    class="form-control" 
+                    placeholder="Retype your password" 
+                    minlength="6" 
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Register Account</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="/login" class="auth-link">Sign in here</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

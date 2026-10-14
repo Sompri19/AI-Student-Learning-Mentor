@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz & Practice Catalog - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="quizzes-catalog-section">
+    <div class="content-container">
+        <!-- Header Banner -->
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">Practice Quizzes & Knowledge Checks</h1>
+                <p class="text-muted">
+                    Test your understanding with authentic, topic-aligned multiple choice assessments. Instant scoring and detailed answer review.
+                </p>
+            </div>
+            <div class="header-action">
+                <a href="{{ url_for('quiz_history') }}" class="btn btn-outline">
+                    📊 My Quiz History
+                </a>
+            </div>
+        </div>
+
+        <!-- Academic Integrity Notice -->
+        <div class="card callout-card callout-info mb-2">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+                <strong>Real Educational Assessments:</strong>
+                All quiz questions are drawn from verified educational curricula stored directly in MySQL. Scores reflect genuine student performance without fabricated attempts or artificial metrics.
+            </div>
+        </div>
+
+        {% if not catalog %}
+            <div class="card empty-state-card">
+                <div class="empty-state-icon">📝</div>
+                <h3>No Quizzes Available</h3>
+                <p class="text-muted">There are currently no quiz questions loaded in the database.</p>
+            </div>
+        {% else %}
+            <!-- Subjects & Topics Accordion/Grid -->
+            <div class="quiz-catalog-list">
+                {% for subj in catalog %}
+                    <div class="card subject-quiz-group-card">
+                        <div class="subject-quiz-header">
+                            <div>
+                                <span class="badge badge-subject">{{ subj.subject_name }}</span>
+                                <h2 class="subject-quiz-title">{{ subj.subject_name }}</h2>
+                                {% if subj.subject_description %}
+                                    <p class="text-muted font-sm">{{ subj.subject_description }}</p>
+                                {% endif %}
+                            </div>
+                            <span class="badge badge-duration">
+                                📝 {{ subj.total_questions }} Total Questions
+                            </span>
+                        </div>
+
+                        <div class="topic-quizzes-grid">
+                            {% for topic in subj.topics %}
+                                <div class="topic-quiz-card">
+                                    <div class="topic-quiz-top">
+                                        <h3 class="topic-quiz-name">{{ topic.topic_name }}</h3>
+                                        <span class="badge badge-difficulty badge-difficulty-{{ topic.difficulty|lower }}">
+                                            {{ topic.difficulty }}
+                                        </span>
+                                    </div>
+                                    <div class="topic-quiz-meta">
+                                        <span class="text-muted font-sm">
+                                            {% if topic.question_count > 0 %}
+                                                {{ topic.question_count }} Questions Available
+                                            {% else %}
+                                                Questions Coming Soon
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="topic-quiz-action">
+                                        {% if topic.question_count > 0 %}
+                                            <a href="{{ url_for('quiz_topic_preview', topic_id=topic.topic_id) }}" class="btn btn-primary btn-sm w-100">
+                                                Start Practice Quiz →
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                                No Questions Yet
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

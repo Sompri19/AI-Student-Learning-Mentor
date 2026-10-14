@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}AI Student Learning Mentor - Your Personal AI-Powered Learning Companion{% endblock %}
+
+{% block content %}
+<meta name="project-milestone" content="Phase 8">
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-container">
+        <h1 class="hero-title">AI Student Learning Mentor</h1>
+        <p class="hero-tagline">"Your Personal AI-Powered Learning Companion"</p>
+        <p class="hero-subtitle">
+            Learn smarter with personalized study plans, practice, AI assistance, and progress tracking.
+        </p>
+        <p class="hero-description">
+            AI Student Learning Mentor is an intelligent, structured educational platform designed to empower students
+            with customized curriculum schedules, conceptual practice questions, doubt resolution, and honest milestone
+            tracking - built on a robust and scalable relational architecture.
+        </p>
+        <div class="hero-actions">
+            {% if current_user %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary" id="cta-start-learning">Go to My Dashboard 🚀</a>
+                <a href="/subjects" class="btn btn-secondary">Explore Subjects</a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary" id="cta-start-learning">Start Learning Free 🚀</a>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">Student Sign In</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Informational Feature Preview Section -->
+<section class="features-section" id="feature-preview">
+    <div class="section-container">
+        <div class="section-header">
+            <span class="section-pill">Integrated Platform Features</span>
+            <h2>Architected for Student Success</h2>
+            <p class="section-description">
+                Explore the core features active across our unified learning platform.
+                All modules operate on real database records with authenticated student workflows.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            {% for feature in features %}
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">{{ feature.icon }}</div>
+                <h3 class="feature-title">{{ feature.title|safe }}</h3>
+                <p class="feature-description">{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

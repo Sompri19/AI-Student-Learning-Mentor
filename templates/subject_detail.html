@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subject.name }} - Syllabus Topics - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="subject-detail-page">
+    <div class="content-container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <a href="/subjects" class="breadcrumb-link">Subjects</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">{{ subject.name|safe }}</span>
+        </nav>
+
+        <!-- Subject Header Banner -->
+        <div class="card subject-banner">
+            <div class="subject-banner-content">
+                <span class="badge phase-badge">Academic Curriculum</span>
+                <h1 class="subject-banner-title">{{ subject.name|safe }}</h1>
+                <p class="subject-banner-desc">{{ subject.description }}</p>
+            </div>
+            <div class="subject-banner-meta">
+                <div class="stat-pill">
+                    <span class="stat-num">{{ topics|length }}</span>
+                    <span class="stat-text">Topics Listed</span>
+                </div>
+                <div class="banner-quick-actions" style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                    <a href="{{ url_for('study_plan_create') }}?subject_id={{ subject.id }}" class="btn btn-outline btn-sm">📅 Plan Study</a>
+                    <a href="{{ url_for('ai_assistant') }}?subject_id={{ subject.id }}" class="btn btn-outline btn-sm">🤖 Ask AI</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topics Header and Difficulty Filter -->
+        <div class="topics-control-row">
+            <div class="control-left">
+                <h2>Syllabus Topics</h2>
+                <p class="text-muted">Master topics progressively from Beginner to Advanced foundations.</p>
+            </div>
+            <div class="control-right">
+                <div class="difficulty-filter-pills">
+                    <a href="/subjects/{{ subject.id }}" class="filter-pill {% if not selected_difficulty %}active{% endif %}">
+                        All ({{ topics|length }})
+                    </a>
+                    {% for diff in allowed_difficulties %}
+                        <a href="/subjects/{{ subject.id }}?difficulty={{ diff }}" class="filter-pill {% if selected_difficulty == diff %}active{% endif %}">
+                            {{ diff }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Topics Grid -->
+        {% if topics %}
+            <div class="topics-grid">
+                {% for topic in topics %}
+                    <div class="card topic-card">
+                        <div class="topic-header">
+                            <span class="badge badge-difficulty badge-{{ topic.difficulty|lower }}">{{ topic.difficulty }}</span>
+                            <span class="resource-count-tag">📑 {{ topic.resource_count }} Resources</span>
+                        </div>
+                        <h3 class="topic-title">{{ topic.topic_name|safe }}</h3>
+                        <p class="topic-desc">{{ topic.description }}</p>
+                        <div class="topic-footer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="/topics/{{ topic.id }}" class="btn btn-primary btn-sm">View Resources →</a>
+                            <a href="{{ url_for('quiz_start', topic_id=topic.id) }}" class="btn btn-outline btn-sm">📝 Quiz</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card empty-results-card">
+                <div class="empty-icon">📂</div>
+                <h4>No topics found matching difficulty '{{ selected_difficulty }}'</h4>
+                <p class="text-muted">Try clearing the difficulty filter to view all syllabus topics under {{ subject.name }}.</p>
+                <a href="/subjects/{{ subject.id }}" class="btn btn-secondary btn-sm">Clear Filter</a>
+            </div>
+        {% endif %}
+
+        <div class="page-back-action">
+            <a href="/subjects" class="btn btn-secondary btn-sm">← Back to All Subjects</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

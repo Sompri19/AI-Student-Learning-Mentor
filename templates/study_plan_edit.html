@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Study Plan - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="form-section">
+    <div class="content-container form-container-wide">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a> &gt; 
+            <a href="{{ url_for('study_plans_list') }}">Study Plans</a> &gt; 
+            <a href="{{ url_for('study_plan_detail', plan_id=plan.id) }}">Plan #{{ plan.id }}</a> &gt; 
+            <span>Edit</span>
+        </nav>
+
+        <div class="form-header">
+            <h1>Edit Study Plan</h1>
+            <p class="text-muted">Update your learning goal, pace, schedule, or adjust the selected syllabus topics.</p>
+        </div>
+
+        <div class="card callout-card callout-warning">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+                <strong>Schedule Regeneration Notice:</strong>
+                Updating the duration (days) or changing the selected topics will regenerate the daily schedule items to reflect your new curriculum scope.
+            </div>
+        </div>
+
+        <form action="{{ url_for('study_plan_edit', plan_id=plan.id) }}" method="POST" class="card study-plan-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <!-- Subject Display (Immutable) -->
+            <div class="form-group">
+                <label class="form-label">Academic Subject</label>
+                <div class="static-form-display">
+                    <span class="badge badge-subject font-lg">{{ plan.subject_name }}</span>
+                    <small class="text-muted ml-2">(Subject cannot be changed. To study a different subject, create a new study plan.)</small>
+                </div>
+            </div>
+
+            <!-- Learning Goal -->
+            <div class="form-group">
+                <label for="goal" class="form-label">
+                    Learning Goal <span class="required">*</span>
+                </label>
+                <textarea name="goal" id="goal" class="form-control" rows="3" required>{{ plan.goal }}</textarea>
+                <small class="form-hint">Your primary academic target for this study cycle.</small>
+            </div>
+
+            <!-- Skill Level & Preferred Time -->
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label for="skill_level" class="form-label">
+                        Skill Level <span class="required">*</span>
+                    </label>
+                    <select name="skill_level" id="skill_level" class="form-control" required>
+                        {% for level in ['Beginner', 'Intermediate', 'Advanced'] %}
+                            <option value="{{ level }}" {% if plan.skill_level == level %}selected{% endif %}>
+                                {{ level }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="preferred_study_time" class="form-label">
+                        Preferred Study Schedule <span class="required">*</span>
+                    </label>
+                    <select name="preferred_study_time" id="preferred_study_time" class="form-control" required>
+                        {% for slot in ['Morning', 'Afternoon', 'Evening', 'Night', 'Flexible'] %}
+                            <option value="{{ slot }}" {% if plan.preferred_study_time == slot %}selected{% endif %}>
+                                {{ slot }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Duration (Days) -->
+            <div class="form-group">
+                <label for="duration_days" class="form-label">
+                    Study Duration (1 - 60 Days) <span class="required">*</span>
+                </label>
+                <div class="duration-input-wrap">
+                    <input type="number" name="duration_days" id="duration_days" class="form-control duration-number" 
+                           min="1" max="60" value="{{ plan.duration_days }}" required>
+                    <span class="duration-unit">Days</span>
+                </div>
+                <small class="form-hint">Changing duration will re-distribute daily learning milestones.</small>
+            </div>
+
+            <!-- Topic Selection -->
+            <div class="form-group">
+                <div class="topic-header-row">
+                    <label class="form-label">
+                        Syllabus Topics Included in this Plan <span class="required">*</span>
+                    </label>
+                </div>
+                <div class="topics-checkbox-grid">
+                    {% for topic in all_topics %}
+                        <label class="topic-checkbox-label" for="topic-edit-{{ topic.id }}">
+                            <input type="checkbox" name="topic_ids" id="topic-edit-{{ topic.id }}" value="{{ topic.id }}"
+                                   {% if topic.id in selected_topic_ids %}checked{% endif %}>
+                            <div class="topic-label-content">
+                                <span class="topic-label-title">{{ topic.topic_name or topic.name }}</span>
+                                <span class="badge badge-difficulty badge-difficulty-{{ topic.difficulty|lower }}">{{ topic.difficulty }}</span>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
+                <small class="form-hint">At least one topic must be checked.</small>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions-row">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Save Changes 💾
+                </button>
+                <a href="{{ url_for('study_plan_detail', plan_id=plan.id) }}" class="btn btn-secondary btn-lg">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

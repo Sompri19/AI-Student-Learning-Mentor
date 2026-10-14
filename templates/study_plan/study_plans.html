@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}My Study Plans - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="study-plans-section">
+    <div class="content-container">
+        <!-- Header Banner -->
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">My Study Plans</h1>
+                <p class="text-muted">Structured, day-by-day learning schedules tailored to your pace, topics, and academic goals.</p>
+            </div>
+            <div class="header-action">
+                <a href="{{ url_for('study_plan_create') }}" class="btn btn-primary">+ Create New Study Plan</a>
+            </div>
+        </div>
+
+        {% if not plans %}
+            <!-- Empty State -->
+            <div class="card empty-state-card">
+                <div class="empty-state-icon">📚</div>
+                <h3>No Study Plans Created Yet</h3>
+                <p class="text-muted">
+                    You haven't generated any study plans yet. Select an academic subject, pick target topics, and specify your deadline to receive a structured daily curriculum with revision milestones.
+                </p>
+                <div class="empty-state-actions">
+                    <a href="{{ url_for('study_plan_create') }}" class="btn btn-primary btn-lg">Create Your First Study Plan</a>
+                    <a href="/subjects" class="btn btn-outline btn-lg">Browse Subjects & Topics</a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Study Plans Grid -->
+            <div class="study-plans-grid">
+                {% for plan in plans %}
+                    <div class="card plan-card">
+                        <div class="plan-card-header">
+                            <span class="badge badge-subject">{{ plan.subject_name }}</span>
+                            <span class="badge badge-duration">⏱ {{ plan.duration_days }} Days</span>
+                        </div>
+
+                        <h3 class="plan-card-goal">{{ plan.goal }}</h3>
+
+                        <div class="plan-meta-row">
+                            <span class="meta-pill">⚡ {{ plan.skill_level }}</span>
+                            <span class="meta-pill">⏰ {{ plan.preferred_study_time }}</span>
+                            {% if plan.created_at %}
+                                <span class="meta-date">📅 {{ plan.created_at.strftime('%b %d, %Y') }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="plan-progress-block">
+                            <div class="progress-label-row">
+                                <span class="progress-title">Completion Progress</span>
+                                <span class="progress-percent font-bold">{{ plan.completion_percentage }}%</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: {{ plan.completion_percentage }}%;"></div>
+                            </div>
+                            <p class="progress-subtext text-muted">
+                                {{ plan.completed_tasks }} of {{ plan.total_tasks }} daily tasks completed
+                            </p>
+                        </div>
+
+                        <!-- Card Actions -->
+                        <div class="plan-card-footer">
+                            <a href="{{ url_for('study_plan_detail', plan_id=plan.id) }}" class="btn btn-primary btn-sm">
+                                View Daily Schedule →
+                            </a>
+                            <div class="plan-action-group">
+                                <a href="{{ url_for('study_plan_edit', plan_id=plan.id) }}" class="btn btn-secondary btn-sm" title="Edit Plan">
+                                    Edit
+                                </a>
+                                <form action="{{ url_for('study_plan_delete', plan_id=plan.id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to permanently delete this study plan?');">
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Delete Plan">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

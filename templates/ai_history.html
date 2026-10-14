@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}My AI Chat History - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="ai-history-section">
+    <div class="content-container">
+        <!-- Header Banner -->
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">My AI Chat History</h1>
+                <p class="text-muted">
+                    Your personal record of academic doubt questions and AI mentor explanations.
+                </p>
+            </div>
+            <div class="header-action">
+                <a href="{{ url_for('ai_assistant') }}" class="btn btn-primary">
+                    + Ask AI Mentor
+                </a>
+            </div>
+        </div>
+
+        {% if not chats %}
+            <!-- Empty State -->
+            <div class="card empty-state-card">
+                <div class="empty-state-icon">💬</div>
+                <h3>No AI conversations yet.</h3>
+                <p class="text-muted">
+                    You haven't asked any academic questions to the AI mentor yet. Ask about confusing concepts, algorithm complexities, syntax differences, or study strategies.
+                </p>
+                <div class="empty-state-actions">
+                    <a href="{{ url_for('ai_assistant') }}" class="btn btn-primary btn-lg">
+                        Ask Your First Question
+                    </a>
+                    <a href="/subjects" class="btn btn-outline btn-lg">
+                        Browse Subjects & Topics
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Conversation Cards Flow -->
+            <div class="ai-chats-list">
+                {% for chat in chats %}
+                    <div class="card ai-chat-card mb-3">
+                        <div class="chat-card-header">
+                            <div class="chat-id-badge">
+                                <span class="badge badge-info">Conversation #{{ chat.id }}</span>
+                            </div>
+                            <span class="text-muted font-sm">
+                                {{ chat.created_at.strftime('%B %d, %Y at %I:%M %p') if chat.created_at else 'Recent' }}
+                            </span>
+                        </div>
+
+                        <!-- Question Row -->
+                        <div class="chat-q-block">
+                            <div class="chat-role-indicator">
+                                <span class="role-icon">👤</span>
+                                <strong>You asked:</strong>
+                            </div>
+                            <p class="chat-q-text">{{ chat.question }}</p>
+                        </div>
+
+                        <!-- Answer Row -->
+                        <div class="chat-a-block mt-2">
+                            <div class="chat-role-indicator">
+                                <span class="role-icon">🤖</span>
+                                <strong>AI Mentor Explanation:</strong>
+                            </div>
+                            <div class="chat-a-content">{{ chat.answer }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Privacy Assurance Note -->
+            <div class="card callout-card callout-info mt-3">
+                <div class="callout-icon">🔒</div>
+                <div class="callout-body font-sm">
+                    <strong>Student Privacy Guaranteed:</strong>
+                    Your AI mentor interactions are private and securely isolated to your student account. Other students and unauthorized guests cannot access your dialogue history.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

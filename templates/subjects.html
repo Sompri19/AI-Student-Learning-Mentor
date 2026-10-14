@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Curriculum Subjects & Learning Resources - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="subjects-page">
+    <div class="content-container">
+        <!-- Page Header -->
+        <div class="page-intro">
+            <span class="badge phase-badge">Learning Content & Resource Engine</span>
+            <h1>Academic Subjects & Learning Content</h1>
+            <p class="subtitle">
+                Explore structured academic subjects, syllabus topics, and verified learning resources.
+            </p>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="card search-filter-card">
+            <form method="GET" action="/subjects" class="search-form">
+                <div class="search-row-main">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ search_query|default('') }}" 
+                            placeholder="Search subjects, topics, notes, videos, or resources (e.g. Python, SQL, Loops)..." 
+                            class="form-control search-input"
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-primary search-btn">Search & Filter</button>
+                    {% if is_searching %}
+                        <a href="/subjects" class="btn btn-secondary clear-btn">Clear</a>
+                    {% endif %}
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="filter-subject">Subject:</label>
+                        <select id="filter-subject" name="subject_id" class="form-control form-control-sm">
+                            <option value="">All Subjects</option>
+                            {% for s in filter_meta.subjects %}
+                                <option value="{{ s.id }}" {% if selected_subject == s.id %}selected{% endif %}>
+                                    {{ s.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filter-difficulty">Difficulty:</label>
+                        <select id="filter-difficulty" name="difficulty" class="form-control form-control-sm">
+                            <option value="">All Difficulties</option>
+                            {% for diff in filter_meta.difficulties %}
+                                <option value="{{ diff }}" {% if selected_difficulty == diff %}selected{% endif %}>
+                                    {{ diff }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filter-type">Resource Type:</label>
+                        <select id="filter-type" name="resource_type" class="form-control form-control-sm">
+                            <option value="">All Types</option>
+                            {% for rt in filter_meta.resource_types %}
+                                <option value="{{ rt }}" {% if selected_resource_type == rt %}selected{% endif %}>
+                                    {{ rt }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% if is_searching %}
+            <!-- Search Results View -->
+            <div class="search-results-summary">
+                <h3>Search Results</h3>
+                <p class="text-muted">
+                    Found <strong>{{ total_matches }}</strong> matching items 
+                    {% if search_query %}for "<em>{{ search_query }}</em>"{% endif %}
+                </p>
+            </div>
+
+            {% if total_matches == 0 %}
+                <div class="card empty-results-card">
+                    <div class="empty-icon">📂</div>
+                    <h4>No learning content matched your query</h4>
+                    <p class="text-muted">Try adjusting your keywords or clearing selected filters to browse all subjects.</p>
+                    <a href="/subjects" class="btn btn-primary btn-sm">Browse All Subjects</a>
+                </div>
+            {% else %}
+                <!-- Matched Subjects -->
+                {% if subjects %}
+                    <div class="results-section">
+                        <h4 class="results-section-title">Matching Subjects ({{ subjects|length }})</h4>
+                        <div class="subjects-grid">
+                            {% for subject in subjects %}
+                                <div class="card subject-card">
+                                    <div class="subject-card-header">
+                                        <span class="subject-icon">📚</span>
+                                        <span class="badge topic-count-badge">{{ subject.topic_count }} Topics</span>
+                                    </div>
+                                    <h3 class="subject-title">{{ subject.name|safe }}</h3>
+                                    <p class="subject-description">{{ subject.description }}</p>
+                                    <div class="subject-card-footer">
+                                        <a href="/subjects/{{ subject.id }}" class="btn btn-primary btn-sm">View Topics →</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Matched Topics -->
+                {% if topics %}
+                    <div class="results-section">
+                        <h4 class="results-section-title">Matching Topics ({{ topics|length }})</h4>
+                        <div class="topics-grid">
+                            {% for topic in topics %}
+                                <div class="card topic-card">
+                                    <div class="topic-header">
+                                        <span class="badge badge-difficulty badge-{{ topic.difficulty|lower }}">{{ topic.difficulty }}</span>
+                                        <span class="topic-subject-tag">{{ topic.subject_name|safe }}</span>
+                                    </div>
+                                    <h4 class="topic-title">{{ topic.topic_name|safe }}</h4>
+                                    <p class="topic-desc">{{ topic.description }}</p>
+                                    <div class="topic-footer">
+                                        <span class="resource-count-tag">📑 {{ topic.resource_count }} Resources</span>
+                                        <a href="/topics/{{ topic.id }}" class="btn btn-outline btn-sm">View Resources →</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Matched Resources -->
+                {% if resources %}
+                    <div class="results-section">
+                        <h4 class="results-section-title">Matching Learning Resources ({{ resources|length }})</h4>
+                        <div class="resources-grid">
+                            {% for res in resources %}
+                                <div class="card resource-card">
+                                    <div class="resource-meta">
+                                        <span class="badge badge-type badge-type-{{ res.resource_type|lower }}">{{ res.resource_type }}</span>
+                                        <span class="badge badge-difficulty badge-{{ res.difficulty|lower }}">{{ res.difficulty }}</span>
+                                    </div>
+                                    <h4 class="resource-title">{{ res.title|safe }}</h4>
+                                    <p class="resource-context">
+                                        <strong>Topic:</strong> {{ res.topic_name|safe }} &bull; <em>{{ res.subject_name|safe }}</em>
+                                    </p>
+                                    <p class="resource-desc">{{ res.description }}</p>
+                                    <div class="resource-action">
+                                        {% if res.is_safe_url %}
+                                            <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                                                Open Resource ↗
+                                            </a>
+                                        {% else %}
+                                            <span class="badge badge-warning">Unsafe URL Disabled</span>
+                                        {% endif %}
+                                        <a href="/topics/{{ res.topic_id }}" class="btn btn-outline btn-sm">View Topic</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        {% else %}
+            <!-- Standard Subject Browse Grid -->
+            <div class="subjects-header-row">
+                <h2>Available Disciplines ({{ subjects|length }})</h2>
+                <p class="text-muted">Select a subject to view its syllabus topics and curated resources.</p>
+            </div>
+
+            <div class="subjects-grid">
+                {% for subject in subjects %}
+                    <div class="card subject-card">
+                        <div class="subject-card-header">
+                            <span class="subject-icon">📚</span>
+                            <span class="badge topic-count-badge">{{ subject.topic_count }} Topics</span>
+                        </div>
+                        <h3 class="subject-title">{{ subject.name|safe }}</h3>
+                        <p class="subject-description">{{ subject.description }}</p>
+                        <div class="subject-card-footer">
+                            <a href="/subjects/{{ subject.id }}" class="btn btn-primary btn-sm">View Topics →</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

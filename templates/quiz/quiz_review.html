@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Review Quiz: {{ attempt.topic_name }} - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="quiz-review-section">
+    <div class="content-container form-container-wide">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a> &gt; 
+            <a href="{{ url_for('quizzes_catalog') }}">Quizzes</a> &gt; 
+            <a href="{{ url_for('quiz_result', attempt_id=attempt.id) }}">Scorecard #{{ attempt.id }}</a> &gt; 
+            <span>Answer Review</span>
+        </nav>
+
+        <!-- Review Header Card -->
+        <div class="card quiz-review-header-card">
+            <div class="review-header-top">
+                <div>
+                    <span class="badge badge-subject">{{ attempt.subject_name }}</span>
+                    <h1 class="review-title">Detailed Answer Review: {{ attempt.topic_name }}</h1>
+                    <p class="text-muted font-sm">
+                        Analyze your submitted answers alongside verified correct answers.
+                    </p>
+                </div>
+                <div class="review-score-pill">
+                    <span class="badge {{ attempt.feedback.badge_class }} font-md">
+                        Score: {{ attempt.score_percentage|int if attempt.score_percentage == attempt.score_percentage|int else attempt.score_percentage }}% ({{ attempt.correct_answers }}/{{ attempt.total_questions }})
+                    </span>
+                </div>
+            </div>
+
+            <div class="review-quick-summary">
+                <span class="summary-stat-tag stat-tag-correct">✓ {{ attempt.correct_answers }} Correct</span>
+                <span class="summary-stat-tag stat-tag-incorrect">✕ {{ attempt.incorrect_answers }} Incorrect</span>
+                <a href="/topics/{{ attempt.topic_id }}" class="review-resource-link">
+                    📖 Revisit Topic Notes & Videos →
+                </a>
+            </div>
+        </div>
+
+        <!-- Questions Review Flow -->
+        <div class="questions-review-list">
+            {% for item in answers %}
+                <div class="card review-question-card {% if item.is_correct %}review-correct-card{% else %}review-incorrect-card{% endif %}">
+                    <div class="review-q-header">
+                        <span class="question-number-pill">Question {{ loop.index }} of {{ answers|length }}</span>
+                        <div class="review-q-badges">
+                            <span class="badge badge-difficulty badge-difficulty-{{ item.difficulty|lower }}">
+                                {{ item.difficulty }}
+                            </span>
+                            {% if item.is_correct %}
+                                <span class="badge badge-success">✓ Correct</span>
+                            {% else %}
+                                <span class="badge badge-danger">✕ Incorrect</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h3 class="question-stem">{{ item.question }}</h3>
+
+                    <div class="review-options-container">
+                        {% for opt_letter, opt_text in [('A', item.option_a), ('B', item.option_b), ('C', item.option_c), ('D', item.option_d)] %}
+                            {% set is_selected = (item.selected_answer == opt_letter) %}
+                            {% set is_correct = (item.correct_answer == opt_letter) %}
+
+                            <div class="review-option-row 
+                                        {% if is_correct %}review-opt-correct{% endif %}
+                                        {% if is_selected and not is_correct %}review-opt-wrong{% endif %}
+                                        {% if is_selected and is_correct %}review-opt-selected-correct{% endif %}">
+                                <span class="option-badge 
+                                             {% if is_correct %}badge-success-fill{% elif is_selected and not is_correct %}badge-danger-fill{% endif %}">
+                                    {{ opt_letter }}
+                                </span>
+                                <span class="review-option-text">{{ opt_text }}</span>
+                                <div class="review-option-indicator">
+                                    {% if is_correct and is_selected %}
+                                        <span class="tag-opt-feedback tag-success">✓ Your Answer (Correct)</span>
+                                    {% elif is_correct %}
+                                        <span class="tag-opt-feedback tag-info">✓ Correct Answer</span>
+                                    {% elif is_selected and not is_correct %}
+                                        <span class="tag-opt-feedback tag-danger">✕ Your Answer</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="review-footer-actions">
+            <a href="{{ url_for('quiz_result', attempt_id=attempt.id) }}" class="btn btn-primary btn-lg">
+                ← Back to Scorecard
+            </a>
+            <a href="{{ url_for('ai_assistant') }}?topic_id={{ attempt.topic_id }}&subject_id={{ attempt.subject_id }}" class="btn btn-secondary btn-lg">
+                Ask AI Mentor 🤖
+            </a>
+            <a href="{{ url_for('quiz_start', topic_id=attempt.topic_id) }}" class="btn btn-outline btn-lg">
+                Retake Quiz 🔄
+            </a>
+            <a href="{{ url_for('quiz_history') }}" class="btn btn-outline btn-lg">
+                All Quiz History 📊
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

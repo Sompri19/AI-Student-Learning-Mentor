@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="dashboard-container">
+        <!-- Welcome Banner -->
+        <div class="dashboard-hero">
+            <div class="hero-left">
+                <h2>Welcome, {{ user.name if user else 'Student' }}! 👋</h2>
+                <p class="text-muted">Here is your comprehensive learning progress and academic mentorship center.</p>
+            </div>
+            <div class="hero-right">
+                <a href="{{ url_for('progress_page') }}" class="btn btn-primary">📊 View Progress Center</a>
+                <a href="/profile" class="btn btn-secondary">Edit Profile</a>
+            </div>
+        </div>
+
+        <!-- Profile Completion Status Banner -->
+        <div class="card status-banner-card {% if completion.is_complete %}status-banner-complete{% else %}status-banner-incomplete{% endif %}">
+            <div class="status-banner-content">
+                <div class="status-banner-icon">
+                    {% if completion.is_complete %}✅{% else %}📋{% endif %}
+                </div>
+                <div class="status-banner-text">
+                    <h4>Profile Status: <span class="badge {% if completion.is_complete %}badge-success{% else %}badge-warning{% endif %}">{{ completion.status_label }}</span> ({{ completion.percentage }}%)</h4>
+                    {% if completion.is_complete %}
+                        <p>Your academic profile is complete. Study plans and quiz recommendations are customized to your goals.</p>
+                    {% else %}
+                        <p>Your student profile has missing information ({{ completion.missing_fields|length }} fields remaining). Complete your profile so study planners can tailor learning schedules to your goals.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="status-banner-action">
+                <a href="/profile" class="btn btn-sm {% if completion.is_complete %}btn-outline{% else %}btn-primary{% endif %}">
+                    {% if completion.is_complete %}Review Profile{% else %}Complete Profile{% endif %}
+                </a>
+            </div>
+        </div>
+
+        <!-- 1. Real Data-Driven Learning Progress Hero -->
+        <div class="card progress-hero-card mb-2">
+            <div class="hero-progress-layout">
+                <div class="hero-progress-visual">
+                    <div class="overall-progress-circle">
+                        <span class="progress-huge-num">{{ overall_progress.overall_percentage }}%</span>
+                        <span class="progress-sub-label">Curriculum Mastery</span>
+                    </div>
+                </div>
+                <div class="hero-progress-details">
+                    <div class="hero-status-row">
+                        <span class="badge status-pill {% if overall_progress.status == 'Completed' %}badge-success{% elif overall_progress.status == 'In Progress' %}badge-info{% else %}badge-neutral{% endif %}">
+                            {{ overall_progress.status }}
+                        </span>
+                        <span class="text-muted font-sm">
+                            Across all {{ overall_progress.total_topics }} topics in curriculum
+                        </span>
+                    </div>
+                    <h3 class="hero-progress-title">Overall Academic Learning Progress</h3>
+                    <p class="hero-progress-explanation">
+                        Calculated deterministically from your completed study plan tasks (40%) and validated quiz scores (60%). Zero synthetic progress.
+                    </p>
+                    <div class="overall-bar-wrapper">
+                        <div class="progress-bar-track progress-bar-lg">
+                            <div class="progress-bar-fill {% if overall_progress.overall_percentage >= 80 %}fill-success{% elif overall_progress.overall_percentage >= 40 %}fill-primary{% else %}fill-warning{% endif %}" 
+                                 style="width: {{ overall_progress.overall_percentage }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="hero-stats-row">
+                        <div class="hero-micro-stat">
+                            <span class="micro-num">{{ overall_progress.topics_completed }}</span>
+                            <span class="micro-label">Topics Mastered (&ge; 80%)</span>
+                        </div>
+                        <div class="hero-micro-stat">
+                            <span class="micro-num">{{ overall_progress.topics_started }}</span>
+                            <span class="micro-label">Topics in Progress</span>
+                        </div>
+                        <div class="hero-micro-stat">
+                            <span class="micro-num">{{ learning_stats.completed_study_tasks }} / {{ learning_stats.total_study_tasks }}</span>
+                            <span class="micro-label">Study Tasks Done</span>
+                        </div>
+                        <div class="hero-micro-stat">
+                            <span class="micro-num">{{ learning_stats.overall_quiz_accuracy }}%</span>
+                            <span class="micro-label">Quiz Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Weak Topics / Priority Revision Alert (if any exist) -->
+        {% if weak_topics %}
+            <div class="card weak-topics-alert-dash mb-2">
+                <div class="dash-header-title">
+                    <span class="card-icon">⚠️</span>
+                    <div>
+                        <h4 class="m-0">Topics Needing Practice (Score &lt; 60%)</h4>
+                        <p class="text-muted font-sm m-0">You have attempted quizzes for these topics but average score is below 60%.</p>
+                    </div>
+                </div>
+                <div class="weak-topics-pills-row mt-2">
+                    {% for wt in weak_topics[:3] %}
+                        <div class="weak-topic-pill-item">
+                            <div class="weak-pill-info">
+                                <strong>{{ wt.topic_name }}</strong>
+                                <span class="badge badge-danger font-xs">{{ wt.avg_quiz_score }}% Avg</span>
+                                <span class="text-muted font-xs">({{ wt.subject_name }})</span>
+                            </div>
+                            <a href="{{ url_for('quiz_start', topic_id=wt.topic_id) }}" class="btn btn-primary btn-xs">Retake Quiz &rarr;</a>
+                        </div>
+                    {% endfor %}
+                    {% if weak_topics|length > 3 %}
+                        <a href="{{ url_for('progress_page') }}#topics-table" class="link-more font-sm">+{{ weak_topics|length - 3 }} more in Progress Center</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- 3. Subject Progress Cards Grid -->
+        <div class="dash-subject-progress-section mb-2">
+            <div class="section-title-wrap">
+                <span class="section-title-icon">📚</span>
+                <div class="flex-between w-100">
+                    <h3 class="section-subtitle m-0">Subject-Wise Mastery</h3>
+                    <a href="{{ url_for('progress_page') }}" class="font-sm link-primary">View Full Breakdown &rarr;</a>
+                </div>
+            </div>
+            <div class="dash-subjects-grid mt-1">
+                {% for sp in subject_progress %}
+                    <div class="card dash-subject-card">
+                        <div class="dash-subject-header">
+                            <h4 class="dash-subject-name">{{ sp.subject_name }}</h4>
+                            <span class="dash-subject-pct">{{ sp.progress_percentage }}%</span>
+                        </div>
+                        <div class="progress-bar-track mt-1">
+                            <div class="progress-bar-fill {% if sp.progress_percentage >= 80 %}fill-success{% elif sp.progress_percentage >= 40 %}fill-primary{% else %}fill-warning{% endif %}" 
+                                 style="width: {{ sp.progress_percentage }}%;"></div>
+                        </div>
+                        <div class="dash-subject-footer mt-2">
+                            <span class="text-muted font-xs">{{ sp.topics_completed }}/{{ sp.total_topics }} Mastered</span>
+                            <span class="text-muted font-xs">Quiz Avg: {{ sp.avg_quiz_score }}%</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 4. Academic Details & Profile Grid -->
+        <div class="dashboard-grid">
+            <!-- Selected Course Card -->
+            <div class="card info-card">
+                <div class="card-icon">🎓</div>
+                <span class="info-label">Selected Course / Major</span>
+                <h3 class="info-value">
+                    {{ profile.course if (profile and profile.course) else 'Not configured yet' }}
+                </h3>
+                <p class="info-subtext">
+                    {{ profile.education_level if (profile and profile.education_level) else 'Education level not set' }}
+                    {% if profile and profile.semester %} • {{ profile.semester }}{% endif %}
+                </p>
+            </div>
+
+            <!-- Skill Level Card -->
+            <div class="card info-card">
+                <div class="card-icon">⚡</div>
+                <span class="info-label">Current Skill Level</span>
+                <h3 class="info-value">
+                    {{ profile.skill_level if (profile and profile.skill_level) else 'Not set' }}
+                </h3>
+                <p class="info-subtext">Used to adapt quiz difficulty & resource complexity</p>
+            </div>
+
+            <!-- Study Time Card -->
+            <div class="card info-card">
+                <div class="card-icon">⏰</div>
+                <span class="info-label">Preferred Study Schedule</span>
+                <h3 class="info-value">
+                    {{ profile.preferred_study_time if (profile and profile.preferred_study_time) else 'Flexible' }}
+                </h3>
+                <p class="info-subtext">Optimal time slot for daily study tasks</p>
+            </div>
+        </div>
+
+        <!-- Learning Goal Card -->
+        <div class="card goal-card">
+            <div class="goal-header">
+                <div class="goal-title-wrap">
+                    <span class="goal-icon">🎯</span>
+                    <h3>Primary Learning Goal</h3>
+                </div>
+                <a href="/profile" class="link-edit">Edit Goal ✎</a>
+            </div>
+            <div class="goal-body">
+                {% if profile and profile.learning_goal %}
+                    <p class="goal-content">{{ profile.learning_goal }}</p>
+                {% else %}
+                    <div class="empty-state">
+                        <p class="text-muted">You haven't set a primary learning goal yet.</p>
+                        <a href="/profile" class="btn btn-secondary btn-sm">Set a Learning Goal</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 5. Recent Activity Feed -->
+        <div class="card dashboard-activity-card mt-2">
+            <div class="quizzes-dash-header">
+                <div class="dash-header-title">
+                    <span class="card-icon">⏱️</span>
+                    <div>
+                        <h3>Recent Learning Activity</h3>
+                        <p class="text-muted">Your latest quiz attempts, study task completions, and AI mentor questions.</p>
+                    </div>
+                </div>
+                <div class="dash-header-actions">
+                    <a href="{{ url_for('progress_page') }}" class="btn btn-outline btn-sm">All Activity &rarr;</a>
+                </div>
+            </div>
+
+            {% if recent_activity %}
+                <div class="activity-timeline-list mt-2">
+                    {% for act in recent_activity %}
+                        <div class="activity-timeline-item">
+                            <div class="activity-timeline-icon">
+                                {{ act.icon }}
+                            </div>
+                            <div class="activity-timeline-body">
+                                <div class="activity-timeline-header">
+                                    <h5 class="activity-timeline-title">{{ act.title }}</h5>
+                                    <span class="activity-timeline-time">
+                                        {{ act.timestamp.strftime('%b %d, %Y &bull; %I:%M %p') if act.timestamp else 'Recent' }}
+                                    </span>
+                                </div>
+                                <p class="activity-timeline-desc text-muted font-sm">{{ act.description }}</p>
+                            </div>
+                            <div class="activity-timeline-action">
+                                <a href="{{ act.url }}" class="btn btn-outline btn-xs">View &rarr;</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-dash">
+                    <p class="text-muted">No recent learning activity yet.</p>
+                    <p class="font-sm text-muted">Complete tasks in a study plan or take a quiz to begin tracking your activity history.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 6. Personalized Study Plans Section (Phase 4) -->
+        <div class="card dashboard-study-plans-card mt-2">
+            <div class="study-plans-dash-header">
+                <div class="dash-header-title">
+                    <span class="card-icon">📚</span>
+                    <div>
+                        <h3>My Personalized Study Plans</h3>
+                        <p class="text-muted">Structured curriculum milestones and daily task progress.</p>
+                    </div>
+                </div>
+                <div class="dash-header-actions">
+                    <a href="{{ url_for('study_plan_create') }}" class="btn btn-primary btn-sm">+ Create Study Plan</a>
+                    {% if study_plans %}
+                        <a href="{{ url_for('study_plans_list') }}" class="btn btn-outline btn-sm">View All ({{ study_plans|length }})</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Authentic Aggregate Stats Grid -->
+            <div class="study-stats-grid">
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ study_stats.total_plans if study_stats else 0 }}</span>
+                    <span class="stat-label">Total Plans</span>
+                </div>
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ study_stats.active_plans if study_stats else 0 }}</span>
+                    <span class="stat-label">Active Plans</span>
+                </div>
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ study_stats.completed_tasks if study_stats else 0 }} / {{ study_stats.total_tasks if study_stats else 0 }}</span>
+                    <span class="stat-label">Tasks Completed</span>
+                </div>
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ study_stats.overall_percentage if study_stats else 0 }}%</span>
+                    <span class="stat-label">Overall Progress</span>
+                </div>
+            </div>
+
+            <!-- List or Empty State -->
+            {% if not study_plans %}
+                <div class="empty-state-dash">
+                    <p class="text-muted">You haven't generated any study plans yet.</p>
+                    <a href="{{ url_for('study_plan_create') }}" class="btn btn-primary btn-sm">Create Your First Plan →</a>
+                </div>
+            {% else %}
+                <div class="dash-plans-list">
+                    {% for plan in study_plans[:3] %}
+                        <div class="dash-plan-row">
+                            <div class="dash-plan-info">
+                                <div class="dash-plan-badges">
+                                    <span class="badge badge-subject">{{ plan.subject_name }}</span>
+                                    <span class="badge badge-duration">⏱ {{ plan.duration_days }} Days</span>
+                                </div>
+                                <h4 class="dash-plan-goal">{{ plan.goal }}</h4>
+                                <span class="dash-plan-progress-text text-muted">
+                                    {{ plan.completed_tasks }} of {{ plan.total_tasks }} tasks completed ({{ plan.completion_percentage }}%)
+                                </span>
+                            </div>
+                            <div class="dash-plan-progress-col">
+                                <div class="progress-bar-track">
+                                    <div class="progress-bar-fill" style="width: {{ plan.completion_percentage }}%;"></div>
+                                </div>
+                            </div>
+                            <div class="dash-plan-btn-col">
+                                <a href="{{ url_for('study_plan_detail', plan_id=plan.id) }}" class="btn btn-primary btn-sm">Continue Plan →</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 7. Practice Quizzes Section (Phase 5) -->
+        <div class="card dashboard-quizzes-card mt-2">
+            <div class="quizzes-dash-header">
+                <div class="dash-header-title">
+                    <span class="card-icon">📝</span>
+                    <div>
+                        <h3>My Practice Quizzes &amp; Assessments</h3>
+                        <p class="text-muted">Authentic test scores and conceptual mastery checks.</p>
+                    </div>
+                </div>
+                <div class="dash-header-actions">
+                    <a href="{{ url_for('quizzes_catalog') }}" class="btn btn-primary btn-sm">+ Start Practice Quiz</a>
+                    {% if quiz_stats and quiz_stats.total_attempts > 0 %}
+                        <a href="{{ url_for('quiz_history') }}" class="btn btn-outline btn-sm">View History ({{ quiz_stats.total_attempts }})</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Authentic Aggregate Quiz Stats Grid -->
+            <div class="study-stats-grid">
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ quiz_stats.total_attempts if quiz_stats else 0 }}</span>
+                    <span class="stat-label">Total Attempts</span>
+                </div>
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ quiz_stats.avg_score if quiz_stats else 0 }}%</span>
+                    <span class="stat-label">Average Score</span>
+                </div>
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ quiz_stats.best_score if quiz_stats else 0 }}%</span>
+                    <span class="stat-label">Best Score</span>
+                </div>
+                <div class="study-stat-item">
+                    <span class="stat-num">{{ quiz_stats.total_questions_answered if quiz_stats else 0 }}</span>
+                    <span class="stat-label">Questions Answered</span>
+                </div>
+            </div>
+
+            <!-- List or Empty State -->
+            {% if not quiz_stats or quiz_stats.total_attempts == 0 %}
+                <div class="empty-state-dash">
+                    <p class="text-muted">No quiz attempts yet.</p>
+                    <a href="{{ url_for('quizzes_catalog') }}" class="btn btn-primary btn-sm">Start Your First Quiz →</a>
+                </div>
+            {% else %}
+                <div class="dash-plans-list">
+                    {% for attempt in quiz_stats.recent_attempts %}
+                        <div class="dash-plan-row">
+                            <div class="dash-plan-info">
+                                <div class="dash-plan-badges">
+                                    <span class="badge badge-subject">{{ attempt.subject_name }}</span>
+                                    <span class="badge badge-duration">{{ attempt.correct_answers }}/{{ attempt.total_questions }} Correct</span>
+                                </div>
+                                <h4 class="dash-plan-goal">{{ attempt.topic_name }}</h4>
+                                <span class="dash-plan-progress-text text-muted">
+                                    Attempted on {{ attempt.attempted_at.strftime('%b %d, %Y') if attempt.attempted_at else 'Recent' }}
+                                </span>
+                            </div>
+                            <div class="dash-plan-progress-col text-center">
+                                <span class="badge font-md {% if attempt.score_percentage >= 75 %}badge-success{% elif attempt.score_percentage >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
+                                    {{ attempt.score_percentage|int if attempt.score_percentage == attempt.score_percentage|int else attempt.score_percentage }}% Score
+                                </span>
+                            </div>
+                            <div class="dash-plan-btn-col">
+                                <a href="{{ url_for('quiz_review', attempt_id=attempt.id) }}" class="btn btn-secondary btn-sm">Review Answers →</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 8. AI Doubt Assistant Section (Phase 6) -->
+        <div class="card dashboard-ai-card mt-2">
+            <div class="quizzes-dash-header">
+                <div class="dash-header-title">
+                    <span class="card-icon">🤖</span>
+                    <div>
+                        <h3>AI Doubt Assistant</h3>
+                        <p class="text-muted">Ask questions about difficult syllabus concepts and receive step-by-step guidance.</p>
+                    </div>
+                </div>
+                <div class="dash-header-actions">
+                    <a href="{{ url_for('ai_assistant') }}" class="btn btn-primary btn-sm">Ask a Question →</a>
+                    <a href="{{ url_for('ai_history') }}" class="btn btn-outline btn-sm">My Chat History</a>
+                </div>
+            </div>
+            <div class="ai-dash-body mt-2">
+                <p class="text-muted font-sm">
+                    Stuck on a tricky academic concept? Select any subject or topic and ask the AI Mentor for an intuitive breakdown with clear examples. No fake AI metrics; conversations are stored in your private history.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

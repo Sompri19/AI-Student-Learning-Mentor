@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Student Learning Mentor - Your Personal AI-Powered Learning Companion">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}AI Student Learning Mentor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1">
+    {% block extra_css %}{% endblock %}
+    <style>
+        /* EcoSort Reference Alignment & Centered Container */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+        }
+        .navbar-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+            min-height: 64px;
+        }
+        .navbar-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+        .navbar-nav .nav-link {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .navbar-nav .nav-link:hover {
+            color: var(--primary);
+            background-color: var(--bg-alt);
+        }
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+            font-weight: 600;
+            background-color: var(--primary-light);
+        }
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-wrap: wrap;
+                padding: 0.75rem 1rem;
+                gap: 0.75rem;
+                min-height: auto;
+            }
+            .navbar-nav {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">
+                <span class="brand-icon">🎓</span>
+                <span class="brand-title">AI Student Learning Mentor</span>
+            </a>
+
+            <div class="navbar-nav">
+                {% if current_user %}
+                    <a href="/dashboard" class="nav-link{% if request.path.startswith('/dashboard') %} active{% endif %}">Dashboard</a>
+                    <a href="/subjects" class="nav-link{% if request.path.startswith('/subjects') or request.path.startswith('/topics') %} active{% endif %}">Subjects</a>
+                    <a href="/progress" class="nav-link{% if request.path.startswith('/progress') %} active{% endif %}">Progress</a>
+                    <a href="/study-plans" class="nav-link{% if request.path.startswith('/study-plans') %} active{% endif %}">Study Plans</a>
+                    <a href="/quizzes" class="nav-link{% if request.path.startswith('/quizzes') %} active{% endif %}">Quizzes</a>
+                    <a href="/ai" class="nav-link{% if request.path.startswith('/ai') %} active{% endif %}">AI Mentor</a>
+                    <a href="/profile" class="nav-link{% if request.path.startswith('/profile') %} active{% endif %}">Profile</a>
+                    <span class="user-pill">👤 {{ current_user.name }}</span>
+                    <a href="/logout" class="nav-link nav-btn nav-btn-outline">Logout</a>
+                {% else %}
+                    <a href="/" class="nav-link{% if request.path == '/' %} active{% endif %}">Home</a>
+                    <a href="/subjects" class="nav-link{% if request.path.startswith('/subjects') or request.path.startswith('/topics') %} active{% endif %}">Subjects</a>
+                    <a href="/login" class="nav-link{% if request.path.startswith('/login') %} active{% endif %}">Login</a>
+                    <a href="/register" class="nav-link{% if request.path.startswith('/register') %} active{% endif %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span class="alert-icon">
+                                {% if category == 'success' %}✓
+                                {% elif category == 'danger' %}✕
+                                {% elif category == 'warning' %}⚠
+                                {% else %}ℹ
+                                {% endif %}
+                            </span>
+                            <span class="alert-text">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 AI Student Learning Mentor. Empowering students with personalized academic guidance.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

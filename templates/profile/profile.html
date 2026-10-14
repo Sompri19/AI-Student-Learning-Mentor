@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Student Profile - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="page-header">
+            <div>
+                <h2>Student Profile</h2>
+                <p class="text-muted">Manage your academic background, current curriculum, and study preferences.</p>
+            </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="profile-layout">
+            <!-- Sidebar Overview Card -->
+            <aside class="profile-sidebar">
+                <div class="card user-summary-card">
+                    <div class="user-avatar">🎓</div>
+                    <h3 class="user-name">{{ user.name if user else 'Student' }}</h3>
+                    <p class="user-email text-muted">{{ user.email if user else '' }}</p>
+                    <span class="badge badge-student">Verified Student</span>
+
+                    <hr class="divider">
+
+                    <div class="completion-box">
+                        <div class="completion-header">
+                            <span class="completion-title">Profile Status</span>
+                            <span class="badge {% if completion.is_complete %}badge-success{% else %}badge-warning{% endif %}">
+                                {{ completion.status_label }}
+                            </span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: {{ completion.percentage }}%;"></div>
+                        </div>
+                        <span class="completion-caption">{{ completion.percentage }}% of profile details completed</span>
+                    </div>
+
+                    {% if not completion.is_complete %}
+                        <div class="hint-card">
+                            <p>Complete all fields below so future study planners can tailor schedules to your exact academic curriculum.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <!-- Main Form Card -->
+            <main class="profile-main">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h3>Academic & Learning Settings</h3>
+                        <p class="text-muted">Update your curriculum and learning preferences below.</p>
+                    </div>
+
+                    <form method="POST" action="/profile" class="profile-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-row">
+                            <div class="form-group col-half">
+                                <label for="education_level">Education Level</label>
+                                <select id="education_level" name="education_level" class="form-control">
+                                    <option value="">-- Select Education Level --</option>
+                                    <option value="High School" {% if profile.education_level == 'High School' %}selected{% endif %}>High School</option>
+                                    <option value="Undergraduate" {% if profile.education_level == 'Undergraduate' %}selected{% endif %}>Undergraduate (Bachelor's)</option>
+                                    <option value="Postgraduate" {% if profile.education_level == 'Postgraduate' %}selected{% endif %}>Postgraduate (Master's / Ph.D.)</option>
+                                    <option value="Diploma / Certification" {% if profile.education_level == 'Diploma / Certification' %}selected{% endif %}>Diploma / Certification</option>
+                                    <option value="Self-Taught / Other" {% if profile.education_level == 'Self-Taught / Other' %}selected{% endif %}>Self-Taught / Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-half">
+                                <label for="course">Course / Degree / Major</label>
+                                <input 
+                                    type="text" 
+                                    id="course" 
+                                    name="course" 
+                                    value="{{ profile.course|default('') }}" 
+                                    class="form-control" 
+                                    placeholder="e.g. Computer Science, Mechanical Eng."
+                                    maxlength="100"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-half">
+                                <label for="semester">Semester / Academic Year</label>
+                                <input 
+                                    type="text" 
+                                    id="semester" 
+                                    name="semester" 
+                                    value="{{ profile.semester|default('') }}" 
+                                    class="form-control" 
+                                    placeholder="e.g. Semester 4, Year 2, Grade 12"
+                                    maxlength="20"
+                                >
+                            </div>
+
+                            <div class="form-group col-half">
+                                <label for="skill_level">Current Skill Level</label>
+                                <select id="skill_level" name="skill_level" class="form-control">
+                                    <option value="">-- Select Skill Level --</option>
+                                    <option value="Beginner" {% if profile.skill_level == 'Beginner' %}selected{% endif %}>Beginner (Foundations & Basics)</option>
+                                    <option value="Intermediate" {% if profile.skill_level == 'Intermediate' %}selected{% endif %}>Intermediate (Comfortable with core concepts)</option>
+                                    <option value="Advanced" {% if profile.skill_level == 'Advanced' %}selected{% endif %}>Advanced (Deep theoretical/practical mastery)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="preferred_study_time">Preferred Study Time</label>
+                            <select id="preferred_study_time" name="preferred_study_time" class="form-control">
+                                <option value="">-- Select Preferred Study Time --</option>
+                                <option value="Morning (6 AM - 12 PM)" {% if profile.preferred_study_time == 'Morning (6 AM - 12 PM)' %}selected{% endif %}>Morning (6 AM - 12 PM)</option>
+                                <option value="Afternoon (12 PM - 5 PM)" {% if profile.preferred_study_time == 'Afternoon (12 PM - 5 PM)' %}selected{% endif %}>Afternoon (12 PM - 5 PM)</option>
+                                <option value="Evening (5 PM - 9 PM)" {% if profile.preferred_study_time == 'Evening (5 PM - 9 PM)' %}selected{% endif %}>Evening (5 PM - 9 PM)</option>
+                                <option value="Night (9 PM - 2 AM)" {% if profile.preferred_study_time == 'Night (9 PM - 2 AM)' %}selected{% endif %}>Night (9 PM - 2 AM)</option>
+                                <option value="Flexible Hours" {% if profile.preferred_study_time == 'Flexible Hours' %}selected{% endif %}>Flexible Hours</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="learning_goal">Primary Learning Goal</label>
+                            <textarea 
+                                id="learning_goal" 
+                                name="learning_goal" 
+                                class="form-control" 
+                                rows="4" 
+                                placeholder="Describe what you want to achieve (e.g. Master algorithms for upcoming semester exams, build full-stack projects, prepare for competitive coding)..."
+                            >{{ profile.learning_goal|default('') }}</textarea>
+                            <span class="form-hint">Be specific. This goal will drive personalized study plan generation in future milestones.</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Profile</button>
+                            <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+{% endblock %}

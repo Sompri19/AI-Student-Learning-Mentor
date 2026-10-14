@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "topic_id": 1,
+    "title": "Python Official Documentation: Data Types",
+    "resource_type": "Documentation",
+    "url": "https://docs.python.org/3/tutorial/introduction.html",
+    "description": "Official Python guide covering numbers, strings, and list indexing fundamentals.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 2,
+    "topic_id": 1,
+    "title": "Understanding Python Variable Scoping",
+    "resource_type": "Article",
+    "url": "https://realpython.com/python-variables/",
+    "description": "Comprehensive article explaining variable assignment, dynamic typing, and object references.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 3,
+    "topic_id": 1,
+    "title": "Interactive Data Types Exercises",
+    "resource_type": "Practice",
+    "url": "https://www.w3schools.com/python/python_datatypes.asp",
+    "description": "Self-paced code challenges and syntax quizzes on Python data types.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 4,
+    "topic_id": 2,
+    "title": "Python Control Flow Guide",
+    "resource_type": "Documentation",
+    "url": "https://docs.python.org/3/tutorial/controlflow.html",
+    "description": "Official guide on if statements, for loops, and the range() function.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 5,
+    "topic_id": 2,
+    "title": "Python Loops and Branching Notes",
+    "resource_type": "Notes",
+    "url": "https://realpython.com/python-conditional-statements/",
+    "description": "Detailed study notes on boolean conditions and loop control keywords (break, continue).",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 6,
+    "topic_id": 3,
+    "title": "Defining Functions in Python",
+    "resource_type": "Documentation",
+    "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions",
+    "description": "In-depth guide on defining functions, default arguments, and lambda expressions.",
+    "difficulty": "Intermediate"
+  },
+  {
+    "id": 7,
+    "topic_id": 3,
+    "title": "Python Modular Programming & Packages",
+    "resource_type": "Article",
+    "url": "https://realpython.com/python-modules-packages/",
+    "description": "Tutorial on structuring reusable Python modules and packages.",
+    "difficulty": "Intermediate"
+  },
+  {
+    "id": 62,
+    "topic_id": 7,
+    "title": "Python Official Documentation: Data Structures (Lists, Tuples, Sets)",
+    "resource_type": "Documentation",
+    "url": "https://docs.python.org/3/tutorial/datastructures.html",
+    "description": "Official Python tutorial covering list methods, list comprehensions, immutable tuples, tuple packing/unpacking, and set algebra.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 63,
+    "topic_id": 7,
+    "title": "Real Python: Python Lists and Tuples \u2014 Concepts and Practical Guide",
+    "resource_type": "Article",
+    "url": "https://realpython.com/python-lists-tuples/",
+    "description": "Comprehensive article explaining memory allocation differences, immutability guarantees, indexing, and slice assignments.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 64,
+    "topic_id": 7,
+    "title": "W3Schools Interactive Python Collections Practice",
+    "resource_type": "Practice",
+    "url": "https://www.w3schools.com/python/python_lists.asp",
+    "description": "Interactive code challenges and quizzes for practicing list manipulation, tuple immutability, and set membership testing.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 65,
+    "topic_id": 7,
+    "title": "freeCodeCamp: Python Lists, Tuples, and Sets Tutorial",
+    "resource_type": "Video",
+    "url": "https://www.youtube.com/watch?v=rfscVS0vtbw",
+    "description": "Video lecture section demonstrating creating, mutating, iterating, and filtering Python lists, tuples, and mathematical sets.",
+    "difficulty": "Beginner"
+  },
+  {
+    "id": 66,
+    "topic_id": 8,
+    "title": "Python Official Documentation: Mapping Types \u2014 dict",
+    "resource_type": "Documentation",
+    "url": "https://docs.python.org/3/library/stdtypes.html#mapping-types-dict",
+    "description": "Standard library reference on dictionary keys, values, items, get with default, dictionary comprehensions, and dict merging.",
+    "difficulty": "Intermediate"
+  },
+  {
+    "id": 67,
+    "topic_id": 8,
+    "title": "Real Python: Dictionaries in Python \u2014 The Complete Guide",
+    "resource_type": "Article",
+    "url": "https://realpython.com/python-dicts/",
+    "description": "In-depth exploration of hash table mechanics, hashability, collision resolution, key restrictions, and performance benchmarks.",
+    "difficulty": "Intermediate"
+  },
+  {
+    "id": 68,
+    "topic_id": 8,
+    "title": "LeetCode Explore: Hash Table Data Structure Practice",
+    "resource_type": "Practice",
+    "url": "https://leetcode.com/explore/learn/card/hash-table/",
+    "description": "Hands-on problem sets implementing key-value maps, duplicate detection, anagram grouping, and frequency counters.",
+    "difficulty": "Intermediate"
+  },
+  {
+    "id": 69,
+    "topic_id": 8,
+    "title": "Python Dictionary Methods and Time Complexities Notes",
+    "resource_type": "Notes",
+    "url": "https://www.geeksforgeeks.org/python-dictionary/",
+    "description": "Concise reference notes summarizing Big-O time complexity for insertion, lookup, and deletion across standard Python dicts.",
+    "difficulty": "Intermediate"
+  }
+]

@@ -1,0 +1,606 @@
+/* =====================================================================
+   Phase 4: Personalized Study Plan Engine
+   ===================================================================== */
+.study-plans-section {
+    padding: 3rem 1.5rem;
+}
+
+.page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.study-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.75rem;
+}
+
+.plan-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--border-color);
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.4);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+.plan-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.plan-card-goal {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.plan-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.meta-pill {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.meta-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+.plan-progress-block {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.progress-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar-track {
+    background: #1e293b;
+    border-radius: 9999px;
+    height: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-large {
+    height: 12px;
+}
+
+.progress-bar-fill {
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+}
+
+.progress-subtext {
+    font-size: 0.78rem;
+    margin-top: 0.5rem;
+}
+
+.plan-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+    gap: 0.5rem;
+}
+
+.plan-action-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Study Plan Creation & Edit Forms */
+.form-container-wide {
+    max-width: 840px;
+    margin: 0 auto;
+}
+
+.study-plan-form {
+    padding: 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.topic-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.topic-batch-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-xs {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.topics-placeholder-box {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 2rem;
+    text-align: center;
+}
+
+.topics-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.topic-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.topic-checkbox-label:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(56, 189, 248, 0.3);
+}
+
+.topic-checkbox-label input[type="checkbox"] {
+    margin-top: 0.2rem;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.topic-label-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.88rem;
+    flex: 1;
+}
+
+.topic-label-title {
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.duration-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 200px;
+}
+
+.duration-number {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.duration-unit {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.duration-presets {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    border-radius: 9999px;
+}
+
+.static-form-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Detail View Styles */
+.study-plan-detail-section {
+    padding: 3rem 1.5rem;
+}
+
+.plan-hero-card {
+    padding: 2.25rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary);
+}
+
+.plan-hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.plan-hero-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.plan-goal-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.35;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.plan-created-subtext {
+    font-size: 0.85rem;
+    margin-bottom: 1.75rem;
+}
+
+.plan-progress-dashboard {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+}
+
+.progress-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+}
+
+.progress-percentage-large {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.topics-summary-card {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.topics-summary-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.plan-topic-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.topic-pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    padding: 0.4rem 0.8rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.topic-pill-link:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Daily Schedule & Tasks */
+.daily-schedule-section {
+    margin-bottom: 2.5rem;
+}
+
+.schedule-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.schedule-header-row h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.task-item-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.task-item-card:hover {
+    border-color: rgba(148, 163, 184, 0.3);
+}
+
+.task-completed {
+    background: rgba(15, 23, 42, 0.4);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.task-day-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 68px;
+    padding: 0.6rem 0.5rem;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.day-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.day-number {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1.1;
+}
+
+.task-completed .day-number {
+    color: #4ade80;
+}
+
+.task-content-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.task-meta-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.task-topic-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+.task-topic-link:hover {
+    text-decoration: underline;
+}
+
+.task-status-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    margin-left: auto;
+}
+
+.status-done {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.status-pending {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.task-instruction-text {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.task-completed .task-instruction-text {
+    color: #94a3b8;
+}
+
+.task-resource-shortcut {
+    margin-top: 0.25rem;
+}
+
+.resource-link-inline {
+    font-size: 0.82rem;
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.resource-link-inline:hover {
+    text-decoration: underline;
+}
+
+.task-action-col {
+    display: flex;
+    align-items: center;
+}
+
+/* Dashboard Study Plans Widget */
+.dashboard-study-plans-card {
+    padding: 1.75rem;
+    margin-top: 1.5rem;
+}
+
+.study-plans-dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dash-header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.dash-header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.study-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: rgba(15, 23, 42, 0.5);
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.study-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.empty-state-dash {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--border-color);
+}
+
+.dash-plans-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dash-plan-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr auto;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+.dash-plan-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+}
+
+.dash-plan-goal {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.dash-plan-progress-text {
+    font-size: 0.78rem;
+}
+

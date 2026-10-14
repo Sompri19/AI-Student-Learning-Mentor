@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Create Study Plan - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="form-section">
+    <div class="content-container form-container-wide">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav">
+            <a href="/">Home</a> &gt; 
+            <a href="{{ url_for('study_plans_list') }}">Study Plans</a> &gt; 
+            <span>Create Plan</span>
+        </nav>
+
+        <div class="form-header">
+            <h1>Create Personalized Study Plan</h1>
+            <p class="text-muted">
+                Configure your subject, target topics, timeline, and study preferences to generate an authentic day-by-day learning schedule.
+            </p>
+        </div>
+
+        <div class="card callout-card callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+                <strong>Deterministic Academic Scheduling:</strong>
+                Your study plan distributes syllabus topics systematically across your requested duration. Daily tasks and milestone reviews are calibrated to your skill level and study schedule without synthetic or fabricated data.
+            </div>
+        </div>
+
+        <form action="{{ url_for('study_plan_create') }}" method="POST" class="card study-plan-form" id="study-plan-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <!-- 1. Subject Selection -->
+            <div class="form-group">
+                <label for="subject_id" class="form-label">
+                    1. Select Academic Subject <span class="required">*</span>
+                </label>
+                <select name="subject_id" id="subject_id" class="form-control" required onchange="handleSubjectChange(this.value)">
+                    <option value="" disabled {% if not selected_subject_id %}selected{% endif %}>-- Choose an academic subject --</option>
+                    {% for subj in subjects %}
+                        <option value="{{ subj.id }}" {% if selected_subject_id == subj.id %}selected{% endif %}>
+                            {{ subj.name }} ({{ subj.topic_count }} topics)
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="form-hint">Selecting a subject reveals its syllabus topics below.</small>
+            </div>
+
+            <!-- 2. Topic Selection -->
+            <div class="form-group" id="topics-section">
+                <div class="topic-header-row">
+                    <label class="form-label">
+                        2. Select Topics to Study <span class="required">*</span>
+                    </label>
+                    <div class="topic-batch-actions" id="batch-actions" style="display: none;">
+                        <button type="button" class="btn btn-xs btn-outline" onclick="toggleAllTopics(true)">Select All</button>
+                        <button type="button" class="btn btn-xs btn-outline" onclick="toggleAllTopics(false)">Deselect All</button>
+                    </div>
+                </div>
+
+                <div id="no-subject-placeholder" class="topics-placeholder-box" {% if selected_subject_id %}style="display: none;"{% endif %}>
+                    <p class="text-muted">Please select an academic subject above to view and select topics.</p>
+                </div>
+
+                <!-- Grouped topic lists per subject -->
+                {% for subj in subjects %}
+                    <div class="subject-topics-group" id="subject-topics-{{ subj.id }}" {% if selected_subject_id != subj.id %}style="display: none;"{% endif %}>
+                        <div class="topics-checkbox-grid">
+                            {% for topic in subj.topics %}
+                                <label class="topic-checkbox-label" for="topic-{{ topic.id }}">
+                                    <input type="checkbox" name="topic_ids" id="topic-{{ topic.id }}" value="{{ topic.id }}" 
+                                           class="topic-input topic-input-{{ subj.id }}"
+                                           {% if selected_topic_ids and topic.id in selected_topic_ids %}checked{% endif %}>
+                                    <div class="topic-label-content">
+                                        <span class="topic-label-title">{{ topic.topic_name or topic.name }}</span>
+                                        <span class="badge badge-difficulty badge-difficulty-{{ topic.difficulty|lower }}">{{ topic.difficulty }}</span>
+                                    </div>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+                <small class="form-hint">Check at least one topic. You may choose any number of topics from the selected subject.</small>
+            </div>
+
+            <!-- 3. Skill Level & Preferred Time Grid -->
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label for="skill_level" class="form-label">
+                        3. Current Skill Level <span class="required">*</span>
+                    </label>
+                    <select name="skill_level" id="skill_level" class="form-control" required>
+                        {% for level in ['Beginner', 'Intermediate', 'Advanced'] %}
+                            <option value="{{ level }}" {% if (default_skill_level or 'Beginner') == level %}selected{% endif %}>
+                                {{ level }} {% if level == 'Beginner' %}(Foundational concepts & syntax){% elif level == 'Intermediate' %}(Applied practice & exercises){% else %}(Internals & deep analysis){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-hint">Calibrates the pedagogical depth of daily tasks.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="preferred_study_time" class="form-label">
+                        4. Preferred Study Schedule <span class="required">*</span>
+                    </label>
+                    <select name="preferred_study_time" id="preferred_study_time" class="form-control" required>
+                        {% for slot in ['Morning', 'Afternoon', 'Evening', 'Night', 'Flexible'] %}
+                            <option value="{{ slot }}" {% if (default_study_time or 'Flexible') == slot %}selected{% endif %}>
+                                {{ slot }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-hint">Integrated into daily task scheduling.</small>
+                </div>
+            </div>
+
+            <!-- 5. Duration (Days) -->
+            <div class="form-group">
+                <label for="duration_days" class="form-label">
+                    5. Study Plan Duration (1 - 60 Days) <span class="required">*</span>
+                </label>
+                <div class="duration-input-wrap">
+                    <input type="number" name="duration_days" id="duration_days" class="form-control duration-number" 
+                           min="1" max="60" value="{{ default_duration or 7 }}" required>
+                    <span class="duration-unit">Days</span>
+                </div>
+                <div class="duration-presets">
+                    <button type="button" class="btn btn-xs btn-outline preset-btn" onclick="setDuration(3)">3 Days</button>
+                    <button type="button" class="btn btn-xs btn-outline preset-btn" onclick="setDuration(7)">7 Days (1 Wk)</button>
+                    <button type="button" class="btn btn-xs btn-outline preset-btn" onclick="setDuration(14)">14 Days (2 Wks)</button>
+                    <button type="button" class="btn btn-xs btn-outline preset-btn" onclick="setDuration(30)">30 Days (1 Mo)</button>
+                </div>
+                <small class="form-hint">
+                    If duration exceeds topic count, structured review days are scheduled. If duration is shorter, topics are grouped systematically.
+                </small>
+            </div>
+
+            <!-- 6. Learning Goal -->
+            <div class="form-group">
+                <label for="goal" class="form-label">
+                    6. Primary Learning Goal <span class="required">*</span>
+                </label>
+                <textarea name="goal" id="goal" class="form-control" rows="3" 
+                          placeholder="e.g., Master core concepts and prepare for upcoming midterm exam." required>{{ default_goal or '' }}</textarea>
+                <small class="form-hint">State your objective; this will be embedded directly in milestone assessment tasks.</small>
+            </div>
+
+            <!-- Submit Row -->
+            <div class="form-actions-row">
+                <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                    Generate Study Plan 🚀
+                </button>
+                <a href="{{ url_for('study_plans_list') }}" class="btn btn-secondary btn-lg">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+function handleSubjectChange(subjectId) {
+    // Hide all subject-specific topic groups
+    document.querySelectorAll('.subject-topics-group').forEach(el => {
+        el.style.display = 'none';
+        // Uncheck boxes in hidden groups to avoid accidental submission of wrong topics
+        el.querySelectorAll('.topic-input').forEach(chk => {
+            chk.checked = false;
+        });
+    });
+
+    const placeholder = document.getElementById('no-subject-placeholder');
+    const batchActions = document.getElementById('batch-actions');
+    const activeGroup = document.getElementById('subject-topics-' + subjectId);
+
+    if (activeGroup) {
+        if (placeholder) placeholder.style.display = 'none';
+        activeGroup.style.display = 'block';
+        if (batchActions) batchActions.style.display = 'inline-flex';
+        // Automatically check all topics for the selected subject initially for student convenience
+        activeGroup.querySelectorAll('.topic-input').forEach(chk => {
+            chk.checked = true;
+        });
+    } else {
+        if (placeholder) placeholder.style.display = 'block';
+        if (batchActions) batchActions.style.display = 'none';
+    }
+}
+
+function toggleAllTopics(checkedState) {
+    const subjectSelect = document.getElementById('subject_id');
+    const subjectId = subjectSelect.value;
+    if (!subjectId) return;
+    const activeGroup = document.getElementById('subject-topics-' + subjectId);
+    if (activeGroup) {
+        activeGroup.querySelectorAll('.topic-input').forEach(chk => {
+            chk.checked = checkedState;
+        });
+    }
+}
+
+function setDuration(days) {
+    const input = document.getElementById('duration_days');
+    if (input) {
+        input.value = days;
+    }
+}
+
+// Initial state on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const subjectSelect = document.getElementById('subject_id');
+    if (subjectSelect && subjectSelect.value) {
+        const batchActions = document.getElementById('batch-actions');
+        if (batchActions) batchActions.style.display = 'inline-flex';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_code|default(500) }} - {{ error_title|default('Error') }} - AI Student Learning Mentor{% endblock %}
+
+{% block content %}
+<section class="error-page-section">
+    <div class="card error-card">
+        <div class="error-code">{{ error_code|default(500) }}</div>
+        <h2>{{ error_title|default('An Error Occurred') }}</h2>
+        <p class="error-message text-muted">{{ message|default("An unexpected condition was encountered. Please try again or return to your dashboard.") }}</p>
+        <div class="error-actions">
+            {% if current_user %}
+                <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+            {% else %}
+                <a href="/" class="btn btn-primary">Return Home</a>
+            {% endif %}
+            <a href="/subjects" class="btn btn-secondary">Browse Subjects</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

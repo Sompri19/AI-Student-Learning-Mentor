@@ -1,0 +1,213 @@
+/* =====================================================================
+   Student Dashboard Page
+   ===================================================================== */
+.dashboard-section {
+    padding: 2.5rem 1.5rem 4rem;
+    flex: 1;
+}
+
+.dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.dashboard-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.hero-left h2 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    margin: 0.5rem 0 0.25rem;
+}
+
+/* Status Banner */
+.status-banner-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    border-left: 5px solid;
+}
+
+.status-banner-complete {
+    border-left-color: var(--success);
+    background: #f0fdf4;
+}
+
+.status-banner-incomplete {
+    border-left-color: var(--warning);
+    background: #fffbeb;
+}
+
+.status-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.status-banner-icon {
+    font-size: 2.25rem;
+}
+
+.status-banner-text h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.status-banner-text p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.card-icon {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-light);
+    font-weight: 700;
+}
+
+.info-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.info-subtext {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: auto;
+}
+
+/* Learning Goal Card */
+.goal-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.goal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.goal-icon {
+    font-size: 1.4rem;
+}
+
+.link-edit {
+    font-size: 0.85rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link-edit:hover {
+    text-decoration: underline;
+}
+
+.goal-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-main);
+}
+
+.empty-state {
+    padding: 1.5rem 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Roadmap Callout */
+.roadmap-callout {
+    background-color: #0f172a;
+    color: #f8fafc;
+    border-color: #1e293b;
+}
+
+.roadmap-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+}
+
+.roadmap-header h4 {
+    font-size: 1.05rem;
+    color: #ffffff;
+}
+
+.roadmap-callout p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+}
+
+.roadmap-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.pill {
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pill-done {
+    background-color: #064e3b;
+    color: #6ee7b7;
+    border: 1px solid #059669;
+}
+
+.pill-pending {
+    background-color: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+}
+
