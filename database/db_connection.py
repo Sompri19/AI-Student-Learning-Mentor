@@ -110,7 +110,10 @@ def get_db_connection(database: str = None, autocommit: bool = True):
         charset='utf8mb4',
         cursorclass=DictCursor,
         autocommit=autocommit,
-        connect_timeout=5
+        connect_timeout=5,
+        ssl_ca=Config.DB_SSL_CA,
+        ssl_verify_cert=True,
+        ssl_verify_identity=True
     )
 
 
@@ -161,7 +164,10 @@ def check_db_health() -> dict:
             password=Config.DB_PASSWORD,
             charset='utf8mb4',
             cursorclass=DictCursor,
-            connect_timeout=3
+            connect_timeout=3,
+            ssl_ca=Config.DB_SSL_CA,
+            ssl_verify_cert=True,
+            ssl_verify_identity=True
         )
         health["connected"] = True
         
@@ -236,7 +242,10 @@ def initialize_database(schema_path: str = None) -> tuple[bool, str]:
             password=Config.DB_PASSWORD,
             charset='utf8mb4',
             autocommit=True,
-            connect_timeout=5
+            connect_timeout=5,
+            ssl_ca=Config.DB_SSL_CA,
+            ssl_verify_cert=True,
+            ssl_verify_identity=True
         )
         
         with connection.cursor() as cursor:

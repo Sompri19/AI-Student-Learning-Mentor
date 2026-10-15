@@ -26,6 +26,16 @@ class Config:
     DB_PASSWORD = os.getenv('DB_PASSWORD', '')
     DB_NAME = os.getenv('DB_NAME', 'student_learning_mentor')
 
+    # Aiven MySQL SSL certificate
+    DB_SSL_CA = os.getenv(
+        'DB_SSL_CA',
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'certs',
+            'aiven-ca.pem'
+        )
+    )
+
     # Security Settings
     _DEV_SECRET_FALLBACK = 'change-this-secret-key'
     _RAW_SECRET = os.getenv('SECRET_KEY')

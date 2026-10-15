@@ -51,3 +51,11 @@ Desktop.ini
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Local environment and Aiven certificates
+.env.save
+.env.*
+!.env.example
+certs/
+*.pem
+.venv/
